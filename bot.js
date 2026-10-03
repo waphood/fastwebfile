@@ -10,16 +10,24 @@ const crypto = require('crypto');
 const CONFIG_PATH = path.join(__dirname, 'bot_config.json');
 
 function loadConfig() {
+  let cfg = {
+    botToken: process.env.BOT_TOKEN || '8921742373:AAEGsuPulshO3WN_fTpRI-1zGvyfZzojY4s',
+    adminId: Number(process.env.ADMIN_ID) || 7936378054,
+    appUrl: process.env.RENDER_EXTERNAL_URL || process.env.APP_URL || 'http://localhost:3000'
+  };
   try {
     if (fs.existsSync(CONFIG_PATH)) {
-      return JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf8'));
+      const fileCfg = JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf8'));
+      cfg = { ...cfg, ...fileCfg };
     }
   } catch {}
-  return {
-    botToken: '8921742373:AAEGsuPulshO3WN_fTpRI-1zGvyfZzojY4s',
-    adminId: 7936378054,
-    appUrl: 'http://localhost:3000'
-  };
+
+  // If running in cloud with automated URL, always use it
+  if (process.env.RENDER_EXTERNAL_URL) {
+    cfg.appUrl = process.env.RENDER_EXTERNAL_URL.replace(/\/+$/, '');
+  }
+
+  return cfg;
 }
 
 function saveConfig(cfg) {

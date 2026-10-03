@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: fastwebfile
+    runtime: node
+    plan: free
+    region: frankfurt
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: BOT_TOKEN
+        value: 8921742373:AAEGsuPulshO3WN_fTpRI-1zGvyfZzojY4s
+      - key: ADMIN_ID
+        value: "7936378054"
