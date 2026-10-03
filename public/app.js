@@ -965,6 +965,10 @@ function renderBundleResult(b) {
           <svg viewBox="0 0 12 12" fill="none"><rect x="1.5" y="3.5" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.2"/><path d="M3.5 3.5V2.5a1 1 0 011-1h5a1 1 0 011 1v5a1 1 0 01-1 1H8.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
           Копировать
         </button>
+        <button class="btn-copy btn-share-native" data-url="${esc(b.url)}" title="Поделиться">
+          <svg viewBox="0 0 16 16" fill="none"><path d="M4 8v5a1 1 0 001 1h6a1 1 0 001-1V8M8 2v8M5 5l3-3 3 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Поделиться
+        </button>
         <a class="btn-copy" href="/api/bundle/${b.id}/zip" download="bundle-${b.id}.zip" style="text-decoration:none;" title="Скачать ZIP архив">
           <svg viewBox="0 0 16 16" fill="none"><path d="M4 3h8v9a2 2 0 01-2 2H6a2 2 0 01-2-2V3z" stroke="currentColor" stroke-width="1.3"/><path d="M8 3v5M6 6h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
           ZIP
@@ -979,8 +983,11 @@ function renderBundleResult(b) {
     </div>`;
 
   resultList.appendChild(row);
-  row.querySelectorAll('.btn-copy').forEach(btn =>
+  row.querySelectorAll('.btn-copy:not(.btn-share-native)').forEach(btn =>
     btn.addEventListener('click', () => copyUrl(btn.dataset.url, btn))
+  );
+  row.querySelectorAll('.btn-share-native').forEach(btn =>
+    btn.addEventListener('click', () => handleNativeShare(btn.dataset.url, 'Пакет файлов', btn))
   );
   row.querySelectorAll('.btn-copy-pin').forEach(btn =>
     btn.addEventListener('click', () => copyPin(btn.dataset.pin, btn))
@@ -1023,6 +1030,10 @@ function renderFileResult(f, i) {
           <svg viewBox="0 0 12 12" fill="none"><rect x="1.5" y="3.5" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.2"/><path d="M3.5 3.5V2.5a1 1 0 011-1h5a1 1 0 011 1v5a1 1 0 01-1 1H8.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
           Копировать
         </button>
+        <button class="btn-copy btn-share-native" data-url="${esc(f.downloadUrl)}" title="Поделиться">
+          <svg viewBox="0 0 16 16" fill="none"><path d="M4 8v5a1 1 0 001 1h6a1 1 0 001-1V8M8 2v8M5 5l3-3 3 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Поделиться
+        </button>
       </div>
     </div>
     <div class="result-item-qr">
@@ -1032,12 +1043,32 @@ function renderFileResult(f, i) {
       </div>
     </div>`;
   resultList.appendChild(row);
-  row.querySelectorAll('.btn-copy').forEach(btn =>
+  row.querySelectorAll('.btn-copy:not(.btn-share-native)').forEach(btn =>
     btn.addEventListener('click', () => copyUrl(btn.dataset.url, btn))
+  );
+  row.querySelectorAll('.btn-share-native').forEach(btn =>
+    btn.addEventListener('click', () => handleNativeShare(btn.dataset.url, f.originalName, btn))
   );
   row.querySelectorAll('.btn-copy-pin').forEach(btn =>
     btn.addEventListener('click', () => copyPin(btn.dataset.pin, btn))
   );
+}
+
+async function handleNativeShare(url, title, btn) {
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        title: title || 'FastWebFile',
+        text: `Файл «${title || 'FastWebFile'}» доступен для скачивания:`,
+        url: url
+      });
+      return;
+    } catch (e) {
+      if (e.name !== 'AbortError') copyUrl(url, btn);
+      return;
+    }
+  }
+  copyUrl(url, btn);
 }
 
 function copyPin(pin, btn) {
