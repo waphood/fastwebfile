@@ -1,0 +1,21 @@
+{
+  "name": "fastwebfile",
+  "version": "1.0.0",
+  "description": "FastWebFile (FWF) — fast and secure file sharing with QR codes",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": ["file-sharing", "qr-code", "upload"],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "multer": "^2.4.0",
+    "qrcode": "^1.5.4",
+    "uuid": "^14.0.2"
+  }
+}

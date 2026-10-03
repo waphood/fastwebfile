@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>P2P Прямая передача — FastWebFile</title>
+  <meta name="description" content="Прямая передача файлов браузер-браузер без лимитов и без загрузки на сервер (WebRTC)." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/style.css" />
+  <style>
+    .p2p-wrap {
+      max-width: 580px;
+      margin: 0 auto;
+      padding: 30px 20px 80px;
+      position: relative;
+      z-index: 1;
+    }
+    .p2p-hero {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    .p2p-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      background: rgba(91,106,240,0.12);
+      border: 1px solid var(--accent-border);
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+    .p2p-tabs {
+      display: flex;
+      background: var(--c2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 4px;
+      margin-bottom: 18px;
+    }
+    .p2p-tab {
+      flex: 1;
+      padding: 9px;
+      border: none;
+      background: transparent;
+      color: var(--t3);
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .p2p-tab.active {
+      background: var(--c4);
+      color: var(--t1);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+    }
+
+    .p2p-code-display {
+      background: var(--c2);
+      border: 1.5px dashed var(--accent-border);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      text-align: center;
+      margin: 16px 0;
+    }
+    .p2p-code-val {
+      font-family: var(--mono);
+      font-size: 38px;
+      font-weight: 800;
+      color: var(--accent);
+      letter-spacing: 8px;
+      line-height: 1.1;
+      margin: 8px 0;
+    }
+    .p2p-status-dot {
+      display: inline-block;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--amber);
+      margin-right: 6px;
+      animation: pulseDot 1.5s infinite;
+    }
+    .p2p-status-dot.connected {
+      background: var(--green);
+      animation: none;
+    }
+    @keyframes pulseDot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.8); }
+    }
+    .p2p-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .p2p-stat-box {
+      background: var(--c2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 10px;
+      text-align: center;
+    }
+    .p2p-stat-title { font-size: 10px; color: var(--t3); text-transform: uppercase; letter-spacing: 0.5px; }
+    .p2p-stat-val { font-family: var(--mono); font-size: 14px; font-weight: 700; color: var(--t1); margin-top: 4px; }
+  </style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-mark">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M3 8h10M8 3l5 5-5 5" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <a href="/" style="text-decoration:none;color:inherit;" class="logo-name">Fast<span>Web</span>File</a>
+      <span class="logo-tag">P2P</span>
+    </div>
+    <div class="main-mode-nav-wrap">
+      <nav class="main-mode-nav">
+        <a href="/" class="mode-nav-btn">
+          <svg viewBox="0 0 16 16" fill="none"><path d="M2 3a1 1 0 011-1h4l2 2h4a1 1 0 011 1v7a1 1 0 01-1 1H3a1 1 0 01-1-1V3z" stroke="currentColor" stroke-width="1.3"/></svg>
+          <span>Файлы</span>
+        </a>
+        <a href="/?drop=1" class="mode-nav-btn">
+          <svg viewBox="0 0 16 16" fill="none"><path d="M8 2L2 5.5v5l6 3.5 6-3.5v-5L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M2 5.5l6 3.5 6-3.5M8 9v5" stroke="currentColor" stroke-width="1.3"/></svg>
+          <span>Drop-папка (сбор)</span>
+        </a>
+        <a href="/p2p" class="mode-nav-btn active">
+          <svg viewBox="0 0 16 16" fill="none"><path d="M8.5 1.5L2.5 9h5.5l-1 5.5 6.5-8H8l.5-5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+          <span>P2P (50 ГБ+)</span>
+        </a>
+      </nav>
+    </div>
+    <div class="header-spacer"></div>
+  </div>
+</header>
+
+<div class="p2p-wrap">
+  <div class="p2p-hero anim">
+    <div class="p2p-badge">
+      <svg viewBox="0 0 16 16" fill="none" style="width:12px;height:12px"><path d="M8.5 1.5L2.5 9h5.5l-1 5.5 6.5-8H8l.5-5z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+      Прямая WebRTC передача
+    </div>
+    <h1>Передавай файлы <em>напрямую</em></h1>
+    <p style="color:var(--t3);font-size:13px;margin-top:4px;">Без ограничений по размеру (50 ГБ+). Файлы идут прямо из браузера в браузер без сохранения на сервере.</p>
+  </div>
+
+  <div class="p2p-tabs">
+    <button class="p2p-tab active" id="tabSend">📤 Отправить</button>
+    <button class="p2p-tab" id="tabReceive">📥 Принять</button>
+  </div>
+
+  <!-- ── SEND P2P CARD ── -->
+  <div class="card anim" id="sendSection">
+    <div class="card-header">
+      <span class="card-title">1. Выбери файл любого размера</span>
+    </div>
+    <div class="card-body">
+      <div class="dropzone" id="p2pDropzone">
+        <div class="drop-icon">
+          <svg viewBox="0 0 20 20" fill="none"><path d="M10 13V4M10 4l3 3M10 4L7 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 14v1a2 2 0 002 2h8a2 2 0 002-2v-1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </div>
+        <p class="drop-label"><span>Выбери файл</span> или перетащи сюда</p>
+        <p class="drop-hint">Любой объем (хоть 100 ГБ) · Без ограничений</p>
+        <input type="file" id="p2pFileSelect" style="display:none;" />
+      </div>
+
+      <div id="p2pFileInfo" hidden style="margin-top:14px;">
+        <div class="file-item">
+          <div class="file-item-icon">
+            <svg viewBox="0 0 20 20" fill="none"><path d="M5 2h7l4 4v12a1 1 0 01-1 1H5a1 1 0 01-1-1V3a1 1 0 011-1z" stroke="currentColor" stroke-width="1.4"/><path d="M12 2v4h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          </div>
+          <div class="file-item-info">
+            <div class="file-item-name" id="selectedP2pName"></div>
+            <div class="file-item-size" id="selectedP2pSize"></div>
+          </div>
+        </div>
+
+        <div class="p2p-code-display" id="senderCodeBlock">
+          <p style="font-size:12px;color:var(--t3);">Сообщи этот 5-значный код получателю:</p>
+          <div class="p2p-code-val" id="senderCodeVal">•••••</div>
+          <p style="font-size:11px;color:var(--t3);"><span class="p2p-status-dot" id="senderStatusDot"></span><span id="senderStatusText">Ожидание подключения получателя...</span></p>
+        </div>
+
+        <div id="transferProgressBlock" hidden style="margin-top:16px;">
+          <div class="progress-track"><div class="progress-bar" id="transferProgressBar"></div></div>
+          <div class="p2p-stats-grid">
+            <div class="p2p-stat-box">
+              <div class="p2p-stat-title">Прогресс</div>
+              <div class="p2p-stat-val" id="statPct">0%</div>
+            </div>
+            <div class="p2p-stat-box">
+              <div class="p2p-stat-title">Скорость</div>
+              <div class="p2p-stat-val" id="statSpeed">0 МБ/с</div>
+            </div>
+            <div class="p2p-stat-box">
+              <div class="p2p-stat-title">Передано</div>
+              <div class="p2p-stat-val" id="statTransferred">0 МБ</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── RECEIVE P2P CARD ── -->
+  <div class="card anim" id="receiveSection" hidden>
+    <div class="card-header">
+      <span class="card-title">Принять файл напрямую</span>
+    </div>
+    <div class="card-body">
+      <div style="text-align:center; padding:10px 0 20px;">
+        <p style="font-size:13px; color:var(--t2); margin-bottom:14px;">Введи 5-значный код (буквы и цифры), который отображается у отправителя:</p>
+        <div class="pin-inputs" style="justify-content:center; margin-bottom:16px;" id="receiverPinInputs">
+          <input type="text" maxlength="1" class="pin-digit-input" data-idx="0" autocomplete="off" autocapitalize="characters" />
+          <input type="text" maxlength="1" class="pin-digit-input" data-idx="1" autocomplete="off" autocapitalize="characters" />
+          <input type="text" maxlength="1" class="pin-digit-input" data-idx="2" autocomplete="off" autocapitalize="characters" />
+          <input type="text" maxlength="1" class="pin-digit-input" data-idx="3" autocomplete="off" autocapitalize="characters" />
+          <input type="text" maxlength="1" class="pin-digit-input" data-idx="4" autocomplete="off" autocapitalize="characters" />
+        </div>
+        <button class="btn-receive" id="btnConnectP2P" style="width:100%; justify-content:center;">
+          <span>Подключиться и скачать</span>
+          <svg viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+
+      <div id="receiverStatusBlock" hidden>
+        <div style="text-align:center; margin-bottom:12px; font-size:12px; color:var(--t2);">
+          <span class="p2p-status-dot" id="receiverStatusDot"></span>
+          <span id="receiverStatusText">Подключение к отправителю...</span>
+        </div>
+        <div class="progress-track"><div class="progress-bar" id="receiverProgressBar"></div></div>
+        <div class="p2p-stats-grid">
+          <div class="p2p-stat-box">
+            <div class="p2p-stat-title">Прогресс</div>
+            <div class="p2p-stat-val" id="recvPct">0%</div>
+          </div>
+          <div class="p2p-stat-box">
+            <div class="p2p-stat-title">Скорость</div>
+            <div class="p2p-stat-val" id="recvSpeed">0 МБ/с</div>
+          </div>
+          <div class="p2p-stat-box">
+            <div class="p2p-stat-title">Получено</div>
+            <div class="p2p-stat-val" id="recvTransferred">0 МБ</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const ICE_CONFIG = {
+    iceServers: [
+      { urls: 'stun:stun.l.google.com:19302' },
+      { urls: 'stun:stun1.l.google.com:19302' }
+    ]
+  };
+  const CHUNK_SIZE = 64 * 1024; // 64KB chunks
+
+  // Tabs
+  const tabSend = document.getElementById('tabSend');
+  const tabReceive = document.getElementById('tabReceive');
+  const sendSection = document.getElementById('sendSection');
+  const receiveSection = document.getElementById('receiveSection');
+
+  tabSend.addEventListener('click', () => {
+    tabSend.classList.add('active'); tabReceive.classList.remove('active');
+    sendSection.removeAttribute('hidden'); receiveSection.setAttribute('hidden', '');
+  });
+  tabReceive.addEventListener('click', () => {
+    tabReceive.classList.add('active'); tabSend.classList.remove('active');
+    receiveSection.removeAttribute('hidden'); sendSection.setAttribute('hidden', '');
+  });
+
+  // Check URL parameter e.g. /p2p/5829
+  const urlPath = location.pathname.split('/');
+  if (urlPath[2] && /^\d{4}$/.test(urlPath[2])) {
+    tabReceive.click();
+    const code = urlPath[2];
+    const inputs = document.querySelectorAll('#receiverPinInputs .pin-digit-input');
+    inputs.forEach((inp, idx) => inp.value = code[idx] || '');
+  }
+
+  // ── SENDER LOGIC ───────────────────────────────────────────────────────────
+  let senderFile = null;
+  let senderPC = null;
+  let senderDC = null;
+  let senderRoomCode = null;
+  let senderSSE = null;
+
+  const p2pDropzone = document.getElementById('p2pDropzone');
+  const p2pFileSelect = document.getElementById('p2pFileSelect');
+  const p2pFileInfo = document.getElementById('p2pFileInfo');
+  const selectedP2pName = document.getElementById('selectedP2pName');
+  const selectedP2pSize = document.getElementById('selectedP2pSize');
+  const senderCodeVal = document.getElementById('senderCodeVal');
+  const senderStatusDot = document.getElementById('senderStatusDot');
+  const senderStatusText = document.getElementById('senderStatusText');
+  const transferProgressBlock = document.getElementById('transferProgressBlock');
+  const transferProgressBar = document.getElementById('transferProgressBar');
+  const statPct = document.getElementById('statPct');
+  const statSpeed = document.getElementById('statSpeed');
+  const statTransferred = document.getElementById('statTransferred');
+
+  p2pDropzone.addEventListener('click', () => p2pFileSelect.click());
+  p2pFileSelect.addEventListener('change', () => {
+    if (p2pFileSelect.files[0]) initSender(p2pFileSelect.files[0]);
+  });
+  p2pDropzone.addEventListener('dragover', e => { e.preventDefault(); p2pDropzone.classList.add('drag-over'); });
+  p2pDropzone.addEventListener('dragleave', () => p2pDropzone.classList.remove('drag-over'));
+  p2pDropzone.addEventListener('drop', e => {
+    e.preventDefault();
+    p2pDropzone.classList.remove('drag-over');
+    if (e.dataTransfer.files[0]) initSender(e.dataTransfer.files[0]);
+  });
+
+  async function initSender(file) {
+    senderFile = file;
+    selectedP2pName.textContent = file.name;
+    selectedP2pSize.textContent = fmtSize(file.size);
+    p2pFileInfo.removeAttribute('hidden');
+    p2pDropzone.style.display = 'none';
+
+    // 1. Create Room
+    const res = await fetch('/api/p2p/room', { method: 'POST' });
+    const { code } = await res.json();
+    senderRoomCode = code;
+    senderCodeVal.textContent = code;
+    senderStatusText.textContent = 'Ожидание подключения получателя...';
+
+    // 2. Open SSE stream
+    senderSSE = new EventSource(`/api/p2p/events/${code}/sender`);
+    senderSSE.onmessage = async e => {
+      const msg = JSON.parse(e.data);
+      if (msg.type === 'peer_joined' || msg.type === 'peer_ready') {
+        senderStatusDot.classList.add('connected');
+        senderStatusText.textContent = 'Получатель подключился! Установка связи...';
+        startWebRTCSender();
+      } else if (msg.type === 'answer') {
+        await senderPC.setRemoteDescription(new RTCSessionDescription(msg.sdp));
+      } else if (msg.type === 'candidate' && msg.candidate) {
+        try { await senderPC.addIceCandidate(new RTCIceCandidate(msg.candidate)); } catch {}
+      }
+    };
+  }
+
+  async function startWebRTCSender() {
+    senderPC = new RTCPeerConnection(ICE_CONFIG);
+    senderDC = senderPC.createDataChannel('fileTransfer', { ordered: true });
+    senderDC.binaryType = 'arraybuffer';
+
+    senderPC.onicecandidate = e => {
+      if (e.candidate) {
+        fetch(`/api/p2p/signal/${senderRoomCode}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ role: 'sender', signal: { type: 'candidate', candidate: e.candidate } })
+        });
+      }
+    };
+
+    senderDC.onopen = () => {
+      senderStatusText.textContent = 'Канал открыт. Передача данных...';
+      transferProgressBlock.removeAttribute('hidden');
+      streamFileToReceiver();
+    };
+
+    const offer = await senderPC.createOffer();
+    await senderPC.setLocalDescription(offer);
+
+    await fetch(`/api/p2p/signal/${senderRoomCode}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ role: 'sender', signal: { type: 'offer', sdp: offer } })
+    });
+  }
+
+  async function streamFileToReceiver() {
+    // Send file metadata header
+    senderDC.send(JSON.stringify({
+      type: 'header',
+      name: senderFile.name,
+      size: senderFile.size,
+      mime: senderFile.type
+    }));
+
+    let offset = 0;
+    const startTime = Date.now();
+    let lastTime = startTime;
+    let lastBytes = 0;
+
+    function readNextChunk() {
+      if (offset >= senderFile.size) {
+        senderDC.send(JSON.stringify({ type: 'done' }));
+        senderStatusText.textContent = 'Файл успешно передан получателю!';
+        return;
+      }
+
+      // Check buffer threshold to avoid congestion
+      if (senderDC.bufferedAmount > 8 * 1024 * 1024) {
+        setTimeout(readNextChunk, 20);
+        return;
+      }
+
+      const slice = senderFile.slice(offset, offset + CHUNK_SIZE);
+      const reader = new FileReader();
+      reader.onload = e => {
+        senderDC.send(e.target.result);
+        offset += e.target.result.byteLength;
+
+        // Stats
+        const now = Date.now();
+        const pct = Math.min(100, Math.round((offset / senderFile.size) * 100));
+        transferProgressBar.style.width = pct + '%';
+        statPct.textContent = pct + '%';
+        statTransferred.textContent = fmtSize(offset);
+
+        if (now - lastTime >= 500) {
+          const speed = ((offset - lastBytes) / (now - lastTime)) * 1000;
+          statSpeed.textContent = (speed / (1024 * 1024)).toFixed(1) + ' МБ/с';
+          lastTime = now;
+          lastBytes = offset;
+        }
+
+        readNextChunk();
+      };
+      reader.readAsArrayBuffer(slice);
+    }
+
+    readNextChunk();
+  }
+
+  // ── RECEIVER LOGIC ─────────────────────────────────────────────────────────
+  const receiverPinInputs = document.querySelectorAll('#receiverPinInputs .pin-digit-input');
+  const btnConnectP2P = document.getElementById('btnConnectP2P');
+  const receiverStatusBlock = document.getElementById('receiverStatusBlock');
+  const receiverStatusDot = document.getElementById('receiverStatusDot');
+  const receiverStatusText = document.getElementById('receiverStatusText');
+  const receiverProgressBar = document.getElementById('receiverProgressBar');
+  const recvPct = document.getElementById('recvPct');
+  const recvSpeed = document.getElementById('recvSpeed');
+  const recvTransferred = document.getElementById('recvTransferred');
+
+  receiverPinInputs.forEach((inp, idx) => {
+    inp.addEventListener('input', () => {
+      inp.value = inp.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase().slice(0, 1);
+      if (inp.value && idx < 4) receiverPinInputs[idx + 1].focus();
+    });
+    inp.addEventListener('keydown', e => {
+      if (e.key === 'Backspace' && !inp.value && idx > 0) receiverPinInputs[idx - 1].focus();
+    });
+    inp.addEventListener('paste', e => {
+      e.preventDefault();
+      const pasteText = (e.clipboardData || window.clipboardData).getData('text').replace(/[^a-zA-Z0-9]/g, '').toUpperCase().slice(0, 5);
+      if (!pasteText) return;
+      for (let i = 0; i < 5; i++) {
+        if (receiverPinInputs[i]) receiverPinInputs[i].value = pasteText[i] || '';
+      }
+      if (pasteText.length === 5) {
+        startReceiver();
+      } else if (receiverPinInputs[pasteText.length]) {
+        receiverPinInputs[pasteText.length].focus();
+      }
+    });
+  });
+
+  btnConnectP2P.addEventListener('click', startReceiver);
+
+  let receiverPC = null;
+  let receiverSSE = null;
+  let recvChunks = [];
+  let recvMeta = null;
+  let recvBytes = 0;
+
+  async function startReceiver() {
+    const code = Array.from(receiverPinInputs).map(i => i.value.trim().toUpperCase()).join('');
+    if (code.length !== 5) return alert('Введи 5 знаков кода (буквы и цифры)');
+
+    btnConnectP2P.disabled = true;
+    receiverStatusBlock.removeAttribute('hidden');
+    receiverStatusText.textContent = 'Подключение к комнате ' + code + '...';
+
+    receiverPC = new RTCPeerConnection(ICE_CONFIG);
+    receiverPC.onicecandidate = e => {
+      if (e.candidate) {
+        fetch(`/api/p2p/signal/${code}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ role: 'receiver', signal: { type: 'candidate', candidate: e.candidate } })
+        });
+      }
+    };
+
+    receiverPC.ondatachannel = e => {
+      const channel = e.channel;
+      channel.binaryType = 'arraybuffer';
+      let startTime = Date.now();
+      let lastTime = startTime;
+      let lastBytes = 0;
+
+      channel.onopen = () => {
+        receiverStatusDot.classList.add('connected');
+        receiverStatusText.textContent = 'Канал открыт. Получение файла...';
+      };
+
+      channel.onmessage = evt => {
+        if (typeof evt.data === 'string') {
+          const msg = JSON.parse(evt.data);
+          if (msg.type === 'header') {
+            recvMeta = msg;
+            recvChunks = [];
+            recvBytes = 0;
+            receiverStatusText.textContent = `Получение «${msg.name}» (${fmtSize(msg.size)})`;
+          } else if (msg.type === 'done') {
+            receiverStatusText.textContent = 'Файл полностью получен! Сохранение...';
+            const blob = new Blob(recvChunks, { type: recvMeta?.mime || 'application/octet-stream' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = recvMeta?.name || 'file';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            showToast('Файл успешно сохранён на диск!');
+          }
+        } else {
+          // ArrayBuffer chunk
+          recvChunks.push(evt.data);
+          recvBytes += evt.data.byteLength;
+
+          const now = Date.now();
+          if (recvMeta && recvMeta.size > 0) {
+            const pct = Math.min(100, Math.round((recvBytes / recvMeta.size) * 100));
+            receiverProgressBar.style.width = pct + '%';
+            recvPct.textContent = pct + '%';
+            recvTransferred.textContent = fmtSize(recvBytes);
+          }
+
+          if (now - lastTime >= 500) {
+            const speed = ((recvBytes - lastBytes) / (now - lastTime)) * 1000;
+            recvSpeed.textContent = (speed / (1024 * 1024)).toFixed(1) + ' МБ/с';
+            lastTime = now;
+            lastBytes = recvBytes;
+          }
+        }
+      };
+    };
+
+    // Open SSE stream
+    receiverSSE = new EventSource(`/api/p2p/events/${code}/receiver`);
+    receiverSSE.onmessage = async e => {
+      const msg = JSON.parse(e.data);
+      if (msg.type === 'offer') {
+        await receiverPC.setRemoteDescription(new RTCSessionDescription(msg.sdp));
+        const answer = await receiverPC.createAnswer();
+        await receiverPC.setLocalDescription(answer);
+
+        await fetch(`/api/p2p/signal/${code}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ role: 'receiver', signal: { type: 'answer', sdp: answer } })
+        });
+      } else if (msg.type === 'candidate' && msg.candidate) {
+        try { await receiverPC.addIceCandidate(new RTCIceCandidate(msg.candidate)); } catch {}
+      }
+    };
+  }
+
+  function fmtSize(b) {
+    if (b < 1024) return b + ' Б';
+    if (b < 1048576) return (b / 1024).toFixed(1) + ' КБ';
+    if (b < 1073741824) return (b / 1048576).toFixed(1) + ' МБ';
+    return (b / 1073741824).toFixed(2) + ' ГБ';
+  }
+  let toastTimer;
+  function showToast(msg) {
+    let t = document.querySelector('.toast');
+    if (!t) { t = Object.assign(document.createElement('div'), {className:'toast'}); document.body.appendChild(t); }
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+  }
+</script>
+</body>
+</html>

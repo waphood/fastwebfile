@@ -1,0 +1,899 @@
+{
+  "bfdad0bd-749b-46db-9331-3350be0a9e00": {
+    "id": "bfdad0bd-749b-46db-9331-3350be0a9e00",
+    "filename": "f1686275-e7b8-4836-9ee3-876f802aa990.pdf",
+    "originalName": "Ð¦Ð¢ Ð¦Ð­ 2026 Ð±Ð¸Ð¾Ð»Ð¾Ð³Ð¸Ñ (2).pdf",
+    "size": 4985915,
+    "mimetype": "application/pdf",
+    "expiry": "once",
+    "expiresAt": null,
+    "uploadedAt": 1790965686205,
+    "downloaded": true
+  },
+  "d3a3d64a-3f1f-42a9-91c1-bbe70c82f709": {
+    "id": "d3a3d64a-3f1f-42a9-91c1-bbe70c82f709",
+    "filename": "0c83c7eb-ce33-4d2d-aa78-8602fd06e4ee.pdf",
+    "originalName": "Урок_1_2_Что_такое_цифровизация_и_в_каких_сферах_она_применяется.pdf",
+    "size": 262901,
+    "mimetype": "application/pdf",
+    "expiry": "once",
+    "expiresAt": null,
+    "uploadedAt": 1790966139337,
+    "downloaded": false
+  },
+  "c6bf1270-7d24-4bfc-b1f6-d9e0c59308e2": {
+    "id": "c6bf1270-7d24-4bfc-b1f6-d9e0c59308e2",
+    "filename": "bc8d4260-07c0-4ed0-bd54-f44796d7e9e0.pdf",
+    "originalName": "Урок_3_4_Понятие_цифровой_экономики.pdf",
+    "size": 2779675,
+    "mimetype": "application/pdf",
+    "expiry": "once",
+    "expiresAt": null,
+    "uploadedAt": 1790966139354,
+    "downloaded": false
+  },
+  "nb2t7": {
+    "id": "nb2t7",
+    "type": "file",
+    "filename": "5cf15202-b650-4466-bfb6-12898ac45570.pdf",
+    "originalName": "Урок_1_2_Что_такое_цифровизация_и_в_каких_сферах_она_применяется.pdf",
+    "size": 262901,
+    "mimetype": "application/pdf",
+    "expiry": "once",
+    "expiresAt": null,
+    "uploadedAt": 1790967273369,
+    "downloaded": false,
+    "pin": "NB2T7"
+  },
+  "pcezx": {
+    "id": "pcezx",
+    "type": "file",
+    "filename": "16ddb5e0-efdb-44ec-ba69-c39bb4f2d4ce.pdf",
+    "originalName": "Урок_3_4_Понятие_цифровой_экономики.pdf",
+    "size": 2779675,
+    "mimetype": "application/pdf",
+    "expiry": "once",
+    "expiresAt": null,
+    "uploadedAt": 1790967273384,
+    "downloaded": false,
+    "pin": "PCEZX"
+  },
+  "9v65a": {
+    "id": "9v65a",
+    "type": "bundle",
+    "files": [
+      {
+        "id": "cngfk",
+        "filename": "4c78e604-49da-479f-821f-44351e51e76c.pdf",
+        "originalName": "Урок_1_2_Что_такое_цифровизация_и_в_каких_сферах_она_применяется.pdf",
+        "size": 262901,
+        "mimetype": "application/pdf"
+      },
+      {
+        "id": "4nc6w",
+        "filename": "52191ca7-6b96-43c3-96b9-7cc6d97e5ca0.pdf",
+        "originalName": "Урок_3_4_Понятие_цифровой_экономики.pdf",
+        "size": 2779675,
+        "mimetype": "application/pdf"
+      }
+    ],
+    "expiry": "once",
+    "expiresAt": null,
+    "uploadedAt": 1790967284737,
+    "pin": "9V65A"
+  },
+  "k4c92": {
+    "id": "k4c92",
+    "type": "bundle",
+    "files": [
+      {
+        "id": "gqr5b",
+        "filename": "a83fc9f6-7713-4d52-934e-3dbbbb37b216.pdf",
+        "originalName": "Урок_1_2_Что_такое_цифровизация_и_в_каких_сферах_она_применяется.pdf",
+        "size": 262901,
+        "mimetype": "application/pdf"
+      },
+      {
+        "id": "qsc8b",
+        "filename": "2611721b-502b-48f0-b06b-585b1700a06f.pdf",
+        "originalName": "Урок_3_4_Понятие_цифровой_экономики.pdf",
+        "size": 2779675,
+        "mimetype": "application/pdf"
+      }
+    ],
+    "expiry": "once",
+    "expiresAt": null,
+    "uploadedAt": 1790967582412,
+    "pin": "K4C92"
+  },
+  "acjfx": {
+    "id": "acjfx",
+    "type": "bundle",
+    "files": [
+      {
+        "id": "zbykj",
+        "filename": "1e996880-a86a-42c3-9cfa-51acaacb53a9.pdf",
+        "originalName": "Урок_1_2_Что_такое_цифровизация_и_в_каких_сферах_она_применяется.pdf",
+        "size": 262901,
+        "mimetype": "application/pdf"
+      },
+      {
+        "id": "3ww8y",
+        "filename": "3b600ab1-6740-48ca-ad24-c8071bf20d5b.pdf",
+        "originalName": "Урок_3_4_Понятие_цифровой_экономики.pdf",
+        "size": 2779675,
+        "mimetype": "application/pdf"
+      }
+    ],
+    "expiry": "once",
+    "expiresAt": null,
+    "uploadedAt": 1790967685743,
+    "pin": "ACJFX"
+  },
+  "b22v2": {
+    "id": "b22v2",
+    "type": "file",
+    "filename": "98aee5aa-4743-48f8-97bb-dfdb35053968.pdf",
+    "originalName": "Урок_1_2_Что_такое_цифровизация_и_в_каких_сферах_она_применяется.pdf",
+    "size": 262901,
+    "mimetype": "application/pdf",
+    "expiry": "once",
+    "expiresAt": null,
+    "uploadedAt": 1790967736796,
+    "downloaded": false,
+    "pin": "B22V2"
+  },
+  "9sjmg": {
+    "id": "9sjmg",
+    "type": "file",
+    "filename": "9f59160d-ee65-43d6-a3db-d632594efdf8.pdf",
+    "originalName": "Урок_3_4_Понятие_цифровой_экономики.pdf",
+    "size": 2779675,
+    "mimetype": "application/pdf",
+    "expiry": "once",
+    "expiresAt": null,
+    "uploadedAt": 1790967736800,
+    "downloaded": false,
+    "pin": "9SJMG"
+  },
+  "y4aky": {
+    "id": "y4aky",
+    "type": "bundle",
+    "files": [
+      {
+        "id": "xv9xa",
+        "filename": "f06d634e-2e02-4ef7-999d-7d470b3dea57.pdf",
+        "originalName": "Урок_1_2_Что_такое_цифровизация_и_в_каких_сферах_она_применяется.pdf",
+        "size": 262901,
+        "mimetype": "application/pdf"
+      },
+      {
+        "id": "f5da8",
+        "filename": "fb896c43-b93f-4157-b7e1-3608042faef0.pdf",
+        "originalName": "Урок_3_4_Понятие_цифровой_экономики.pdf",
+        "size": 2779675,
+        "mimetype": "application/pdf"
+      }
+    ],
+    "expiry": "once",
+    "expiresAt": null,
+    "uploadedAt": 1790968227279,
+    "pin": "Y4AKY"
+  },
+  "f44fv": {
+    "id": "f44fv",
+    "type": "file",
+    "filename": "9b6f3a33-795e-4eb3-b3ec-593ae85a2407.pdf",
+    "originalName": "Урок_3_4_Понятие_цифровой_экономики.pdf",
+    "size": 2779675,
+    "mimetype": "application/pdf",
+    "expiry": "once",
+    "expiresAt": null,
+    "uploadedAt": 1790968386370,
+    "downloaded": false,
+    "pin": "F44FV"
+  },
+  "htvcw": {
+    "id": "htvcw",
+    "type": "file",
+    "filename": "8d1439b2-afef-4254-af58-93bc43b384d1.pdf",
+    "originalName": "Урок_3_4_Понятие_цифровой_экономики.pdf",
+    "size": 2779675,
+    "mimetype": "application/pdf",
+    "expiry": "once",
+    "expiresAt": null,
+    "passwordHash": "0ffe1abd1a08215353c233d6e009613e95eec4253832a761af28ff37ac5a150c",
+    "uploadedAt": 1790971131873,
+    "downloaded": true,
+    "pin": "HTVCW"
+  },
+  "jj88w": {
+    "id": "jj88w",
+    "type": "bundle",
+    "files": [
+      {
+        "id": "rfrx3",
+        "filename": "420e3cab-f1ec-43c0-a791-7b85f21ef2c8.pdf",
+        "originalName": "Урок_1_2_Что_такое_цифровизация_и_в_каких_сферах_она_применяется.pdf",
+        "size": 262901,
+        "mimetype": "application/pdf"
+      },
+      {
+        "id": "ym8f5",
+        "filename": "dbe2070c-fb0c-4b17-846d-e6721c0cad52.pdf",
+        "originalName": "Урок_3_4_Понятие_цифровой_экономики.pdf",
+        "size": 2779675,
+        "mimetype": "application/pdf"
+      }
+    ],
+    "expiry": "once",
+    "expiresAt": null,
+    "passwordHash": null,
+    "uploadedAt": 1790971734978,
+    "pin": "JJ88W"
+  },
+  "qx9n5": {
+    "id": "qx9n5",
+    "type": "file",
+    "filename": "41faa533-330d-4e73-bba1-3fc8a55bef06.png",
+    "originalName": "screenshot-2026-10-02-23915.png",
+    "size": 361903,
+    "mimetype": "image/png",
+    "expiry": "once",
+    "expiresAt": null,
+    "passwordHash": null,
+    "uploadedAt": 1790971758365,
+    "downloaded": false,
+    "pin": "QX9N5"
+  },
+  "nqhxh": {
+    "id": "nqhxh",
+    "type": "file",
+    "filename": "ffec41b4-e699-4348-9240-3968b22d412c.png",
+    "originalName": "screenshot-2026-10-02-23916.png",
+    "size": 361903,
+    "mimetype": "image/png",
+    "expiry": "once",
+    "expiresAt": null,
+    "passwordHash": null,
+    "uploadedAt": 1790971758373,
+    "downloaded": false,
+    "pin": "NQHXH"
+  },
+  "u3nr5": {
+    "id": "u3nr5",
+    "type": "file",
+    "filename": "a42a0bd9-10da-43c7-b683-91421cd886b5.png",
+    "originalName": "screenshot-2026-10-02-23917.png",
+    "size": 361903,
+    "mimetype": "image/png",
+    "expiry": "once",
+    "expiresAt": null,
+    "passwordHash": null,
+    "uploadedAt": 1790971758378,
+    "downloaded": false,
+    "pin": "U3NR5"
+  },
+  "rqp2s": {
+    "id": "rqp2s",
+    "type": "file",
+    "filename": "a5d07e83-fb0c-4ce6-90ff-080486f1b65c.pdf",
+    "originalName": "Урок_3_4_Понятие_цифровой_экономики.pdf",
+    "size": 2779675,
+    "mimetype": "application/pdf",
+    "expiry": "once",
+    "expiresAt": null,
+    "passwordHash": null,
+    "uploadedAt": 1790972353827,
+    "downloaded": false,
+    "pin": "RQP2S"
+  },
+  "59h7k": {
+    "id": "59h7k",
+    "type": "file",
+    "filename": "020876f8-04b5-41f2-82ef-7f276d4be3d3.pdf",
+    "originalName": "Урок_3_4_Понятие_цифровой_экономики.pdf",
+    "size": 2779675,
+    "mimetype": "application/pdf",
+    "expiry": "once",
+    "expiresAt": null,
+    "passwordHash": null,
+    "uploadedAt": 1790972368068,
+    "downloaded": false,
+    "pin": "59H7K"
+  },
+  "zs9mk": {
+    "id": "zs9mk",
+    "pin": "ZS9MK",
+    "type": "file",
+    "description": "йичо",
+    "filename": "eb144bbd-2d50-47e0-89a6-6439038e104a.png",
+    "originalName": "Снимок экрана 2026-09-16 215737.png",
+    "size": 28040,
+    "mimetype": "image/png",
+    "expiry": "once",
+    "expiresAt": null,
+    "passwordHash": null,
+    "uploadedAt": 1790973037886,
+    "downloaded": false
+  },
+  "4h6fp": {
+    "id": "4h6fp",
+    "pin": "4H6FP",
+    "type": "file",
+    "description": "Срочно ознакомиться до понедельника!",
+    "filename": "7d23d06f-0ccc-4c10-af48-da414d61e664.txt",
+    "originalName": "test_doc.txt",
+    "size": 57,
+    "mimetype": "application/octet-stream",
+    "expiry": "1day",
+    "expiresAt": 1791059469756,
+    "passwordHash": null,
+    "uploadedAt": 1790973069756,
+    "downloaded": false
+  },
+  "q6b6b": {
+    "id": "q6b6b",
+    "pin": "Q6B6B",
+    "type": "bundle",
+    "description": "Архив проектной документации",
+    "files": [
+      {
+        "id": "tw8ka",
+        "filename": "1da0a8f8-d9c9-4297-9452-be08834a00b7.txt",
+        "originalName": "doc1.txt",
+        "size": 14,
+        "mimetype": "application/octet-stream"
+      },
+      {
+        "id": "87ad7",
+        "filename": "725d9527-b1ff-4ede-8338-89461c4d0063.txt",
+        "originalName": "doc2.txt",
+        "size": 14,
+        "mimetype": "application/octet-stream"
+      }
+    ],
+    "expiry": "3days",
+    "expiresAt": 1791232275704,
+    "passwordHash": null,
+    "uploadedAt": 1790973075705
+  },
+  "qe8s3": {
+    "id": "qe8s3",
+    "pin": "QE8S3",
+    "type": "drop",
+    "title": "Тестовая папка",
+    "ownerKey": "f29ca3905c965bc88ddd3e2a9a5c8107",
+    "files": [],
+    "expiry": "3days",
+    "expiresAt": 1791233387651,
+    "passwordHash": null,
+    "uploadedAt": 1790974187651
+  },
+  "yv2cs": {
+    "id": "yv2cs",
+    "pin": "YV2CS",
+    "type": "file",
+    "description": null,
+    "filename": "f887c6c2-7c62-4a0f-b65c-ccbdd75abe68.txt",
+    "originalName": "test_chunk.txt",
+    "size": 10,
+    "mimetype": "application/octet-stream",
+    "expiry": "1day",
+    "expiresAt": 1791060608791,
+    "passwordHash": null,
+    "uploadedAt": 1790974208791,
+    "downloaded": false
+  },
+  "jzfdj": {
+    "id": "jzfdj",
+    "pin": "JZFDJ",
+    "type": "drop",
+    "title": "123123",
+    "ownerKey": "3162e1fedf9737a98a93576daecff44b",
+    "files": [
+      {
+        "id": "pbx7x",
+        "filename": "63da487e-91d4-4c87-99c6-32a833dbeb66.pdf",
+        "originalName": "Урок_1_2_Что_такое_цифровизация_и_в_каких_сферах_она_применяется.pdf",
+        "size": 262901,
+        "mimetype": "application/pdf",
+        "senderName": "3134",
+        "uploadedAt": 1790974272945
+      }
+    ],
+    "expiry": "3days",
+    "expiresAt": 1791233449662,
+    "passwordHash": null,
+    "uploadedAt": 1790974249662
+  },
+  "uq6wy": {
+    "id": "uq6wy",
+    "pin": "UQ6WY",
+    "type": "drop",
+    "title": "Drop-папка",
+    "ownerKey": "42ac3d6aef1e74d9591c1b2e1e55baf9",
+    "files": [
+      {
+        "id": "287ze",
+        "filename": "21e865e8-d2c6-4e3d-8163-2614995fcde4.pdf",
+        "originalName": "Урок_3_4_Понятие_цифровой_экономики.pdf",
+        "size": 2779675,
+        "mimetype": "application/pdf",
+        "senderName": "ЯЙЦООО",
+        "uploadedAt": 1790974481930
+      }
+    ],
+    "expiry": "3days",
+    "expiresAt": 1791233661782,
+    "passwordHash": null,
+    "uploadedAt": 1790974461782
+  },
+  "62pbj": {
+    "id": "62pbj",
+    "pin": "62PBJ",
+    "type": "drop",
+    "title": "123",
+    "ownerKey": "4d1db1951731c9dcc6ba066dd33f8e13",
+    "files": [
+      {
+        "id": "4rdfc",
+        "filename": "4c0b8817-12ce-48dc-beee-bd9064baff47.pdf",
+        "originalName": "Урок_1_2_Что_такое_цифровизация_и_в_каких_сферах_она_применяется.pdf",
+        "size": 262901,
+        "mimetype": "application/pdf",
+        "senderName": "Аноним",
+        "uploadedAt": 1790974739449
+      },
+      {
+        "id": "tx2fc",
+        "filename": "2dbbbf5d-3bf0-4494-8aba-36c20e2f1c4c.pdf",
+        "originalName": "Урок_3_4_Понятие_цифровой_экономики.pdf",
+        "size": 2779675,
+        "mimetype": "application/pdf",
+        "senderName": "Аноним",
+        "uploadedAt": 1790974739449
+      },
+      {
+        "id": "thmnh",
+        "filename": "0f5d2f53-5ecb-410f-8a7a-b31054da3725.zip",
+        "originalName": "millimetrovki-a4.zip",
+        "size": 59377,
+        "mimetype": "application/x-zip-compressed",
+        "senderName": "Аноним",
+        "uploadedAt": 1790974739449
+      },
+      {
+        "id": "wqw99",
+        "filename": "dbd799c1-b208-4086-908a-e3a6082ec7c2.zip",
+        "originalName": "ramka-A4.zip",
+        "size": 288469,
+        "mimetype": "application/x-zip-compressed",
+        "senderName": "Аноним",
+        "uploadedAt": 1790974739449
+      },
+      {
+        "id": "d4p5a",
+        "filename": "0b145a80-b00a-41c9-80fd-7bdf529ee3bf.zip",
+        "originalName": "ramka-A4-L.zip",
+        "size": 67180,
+        "mimetype": "application/x-zip-compressed",
+        "senderName": "Аноним",
+        "uploadedAt": 1790974739449
+      },
+      {
+        "id": "4fmec",
+        "filename": "ae7e9dc0-72dd-4ce2-b5d3-45f1afcbe8f5.pdf",
+        "originalName": "Рамка А4.pdf",
+        "size": 21113,
+        "mimetype": "application/pdf",
+        "senderName": "Аноним",
+        "uploadedAt": 1790974739449
+      }
+    ],
+    "expiry": "3days",
+    "expiresAt": 1791233883245,
+    "passwordHash": null,
+    "uploadedAt": 1790974683245
+  },
+  "bz5av": {
+    "id": "bz5av",
+    "pin": "BZ5AV",
+    "type": "drop",
+    "title": "Проект 2026",
+    "ownerKey": "a34d81a61ed9dca59a059835f7501df0",
+    "files": [],
+    "expiry": "3days",
+    "expiresAt": 1791233905150,
+    "passwordHash": null,
+    "uploadedAt": 1790974705150
+  },
+  "catrp": {
+    "id": "catrp",
+    "pin": "CATRP",
+    "type": "drop",
+    "title": "Drop-папка",
+    "ownerKey": "953ced3933b16405f84470bbb679931c",
+    "files": [],
+    "expiry": "3days",
+    "expiresAt": 1791234064641,
+    "passwordHash": null,
+    "uploadedAt": 1790974864641
+  },
+  "dn2ay": {
+    "id": "dn2ay",
+    "pin": "DN2AY",
+    "type": "drop",
+    "title": "Drop-папка",
+    "ownerKey": "6f83a7e1e31be8c05f25c7e2b4887c4c",
+    "files": [],
+    "expiry": "3days",
+    "expiresAt": 1791234080087,
+    "passwordHash": null,
+    "uploadedAt": 1790974880087
+  },
+  "78g5n": {
+    "id": "78g5n",
+    "pin": "78G5N",
+    "type": "drop",
+    "title": "Drop-папка",
+    "ownerKey": "95a6d62075e5b6da1d00827c498038d6",
+    "files": [],
+    "expiry": "3days",
+    "expiresAt": 1791234465482,
+    "passwordHash": null,
+    "uploadedAt": 1790975265482
+  },
+  "ts5zm": {
+    "id": "ts5zm",
+    "pin": "TS5ZM",
+    "type": "file",
+    "description": "876869869876",
+    "filename": "3ed8edbd-d09c-450e-9e20-a14c8e7aa2c2.zip",
+    "originalName": "ramka-A4-L.zip",
+    "size": 67180,
+    "mimetype": "application/x-zip-compressed",
+    "expiry": "once",
+    "expiresAt": null,
+    "passwordHash": null,
+    "uploadedAt": 1790975307420,
+    "downloaded": false
+  },
+  "zstnv": {
+    "id": "zstnv",
+    "pin": "ZSTNV",
+    "type": "drop",
+    "title": "???????? ?????",
+    "ownerKey": "7e939126d51197c8b26e41b1990bf496",
+    "files": [],
+    "expiry": "3days",
+    "expiresAt": 1791278530075,
+    "passwordHash": null,
+    "uploadedAt": 1791019330075
+  },
+  "ba3v6": {
+    "id": "ba3v6",
+    "pin": "BA3V6",
+    "type": "drop",
+    "title": "123",
+    "ownerKey": "fd82799261746639c6713bf47943a18b",
+    "files": [],
+    "expiry": "3days",
+    "expiresAt": 1791278717805,
+    "passwordHash": null,
+    "uploadedAt": 1791019517805
+  },
+  "v7fcj": {
+    "id": "v7fcj",
+    "pin": "V7FCJ",
+    "type": "drop",
+    "title": "Drop-папка",
+    "ownerKey": "5ddbc9a6d2c1a9205aef413f2f1f63e7",
+    "files": [
+      {
+        "id": "n3m25",
+        "filename": "7dd10f76-7d57-4a1a-9453-3b18b2c40d1d.zip",
+        "originalName": "millimetrovki-a4.zip",
+        "size": 59377,
+        "mimetype": "application/x-zip-compressed",
+        "senderName": "Аноним",
+        "uploadedAt": 1791019726010
+      },
+      {
+        "id": "cn264",
+        "filename": "11c399c0-3002-4740-b9cd-7c62f7f5d0a4.zip",
+        "originalName": "ramka-A4.zip",
+        "size": 288469,
+        "mimetype": "application/x-zip-compressed",
+        "senderName": "Аноним",
+        "uploadedAt": 1791019726010
+      },
+      {
+        "id": "mj3gp",
+        "filename": "1ae8e3b0-7a6a-442b-a9eb-54092cad93ac.zip",
+        "originalName": "ramka-A4-L.zip",
+        "size": 67180,
+        "mimetype": "application/x-zip-compressed",
+        "senderName": "Аноним",
+        "uploadedAt": 1791019726010
+      },
+      {
+        "id": "dxj9a",
+        "filename": "30db217a-7af0-46ca-8cb6-93a37abc925c.pdf",
+        "originalName": "Рамка А4.pdf",
+        "size": 21113,
+        "mimetype": "application/pdf",
+        "senderName": "Аноним",
+        "uploadedAt": 1791019726010
+      },
+      {
+        "id": "9vr77",
+        "filename": "509925c1-84eb-4d2c-babe-465a90c0a4a2.zip",
+        "originalName": "millimetrovki-a4.zip",
+        "size": 59377,
+        "mimetype": "application/x-zip-compressed",
+        "senderName": "Аноним",
+        "uploadedAt": 1791019755325
+      },
+      {
+        "id": "45rew",
+        "filename": "69ddf7cc-6098-4a49-8ee6-369dae686c71.zip",
+        "originalName": "ramka-A4.zip",
+        "size": 288469,
+        "mimetype": "application/x-zip-compressed",
+        "senderName": "Аноним",
+        "uploadedAt": 1791019755325
+      },
+      {
+        "id": "b62bv",
+        "filename": "8674d7a8-f949-4ded-a582-e3b39f8a2cbb.zip",
+        "originalName": "ramka-A4-L.zip",
+        "size": 67180,
+        "mimetype": "application/x-zip-compressed",
+        "senderName": "Аноним",
+        "uploadedAt": 1791019755325
+      },
+      {
+        "id": "d2tn6",
+        "filename": "e496eaf2-29f8-4ef2-a7f9-2f7bf904e950.pdf",
+        "originalName": "Рамка А4.pdf",
+        "size": 21113,
+        "mimetype": "application/pdf",
+        "senderName": "Аноним",
+        "uploadedAt": 1791019755325
+      }
+    ],
+    "expiry": "3days",
+    "expiresAt": 1791278921996,
+    "passwordHash": null,
+    "uploadedAt": 1791019721996
+  },
+  "nu8yn": {
+    "id": "nu8yn",
+    "pin": "NU8YN",
+    "type": "drop",
+    "title": "???? ????????????? PIN",
+    "ownerKey": "fe8012a8bebb14015e9878959b68f271",
+    "files": [],
+    "expiry": "3days",
+    "expiresAt": 1791279136174,
+    "passwordHash": null,
+    "uploadedAt": 1791019936174
+  },
+  "pqmhf": {
+    "id": "pqmhf",
+    "pin": "PQMHF",
+    "type": "file",
+    "description": null,
+    "filename": "6789d1e5-79d4-4126-acc0-f335fe46c15a.png",
+    "originalName": "Снимок экрана 2026-09-16 212146.png",
+    "size": 65838,
+    "mimetype": "image/png",
+    "expiry": "once",
+    "expiresAt": null,
+    "passwordHash": null,
+    "uploadedAt": 1791020034910,
+    "downloaded": false
+  },
+  "c4jmd": {
+    "id": "c4jmd",
+    "pin": "C4JMD",
+    "type": "file",
+    "description": null,
+    "filename": "7a1f3be5-7942-455b-9783-2795d73837a3.png",
+    "originalName": "Снимок экрана 2026-09-16 212146.png",
+    "size": 65838,
+    "mimetype": "image/png",
+    "expiry": "once",
+    "expiresAt": null,
+    "passwordHash": null,
+    "uploadedAt": 1791020520143,
+    "downloaded": false
+  },
+  "qu98r": {
+    "id": "qu98r",
+    "pin": "QU98R",
+    "type": "drop",
+    "title": "Drop-папка",
+    "ownerKey": "8b7798e92d558925cee7bc94abfb07e4",
+    "files": [
+      {
+        "id": "tbwwf",
+        "filename": "6f265008-8898-4d09-b4ce-fc6df76be7b3.png",
+        "originalName": "Снимок экрана 2026-09-19 134207.png",
+        "size": 3183463,
+        "mimetype": "image/png",
+        "senderName": "Аноним",
+        "uploadedAt": 1791020529985
+      }
+    ],
+    "expiry": "3days",
+    "expiresAt": 1791279727114,
+    "passwordHash": null,
+    "uploadedAt": 1791020527114
+  },
+  "tq9es": {
+    "id": "tq9es",
+    "pin": "TQ9ES",
+    "type": "bundle",
+    "description": null,
+    "files": [
+      {
+        "id": "sjz7p",
+        "filename": "91ddae52-ba48-49d3-91a3-0c09a63d3eb0.png",
+        "originalName": "Снимок экрана 2026-09-14 220919.png",
+        "size": 33174,
+        "mimetype": "image/png"
+      },
+      {
+        "id": "q8w2c",
+        "filename": "675410c9-fd92-43aa-8330-b1b7653c0f93.png",
+        "originalName": "Снимок экрана 2026-09-16 212146.png",
+        "size": 65838,
+        "mimetype": "image/png"
+      },
+      {
+        "id": "8f8zv",
+        "filename": "26a0d6ef-74ef-480e-807a-488250eeb571.png",
+        "originalName": "Снимок экрана 2026-09-16 215412.png",
+        "size": 49331,
+        "mimetype": "image/png"
+      },
+      {
+        "id": "74h59",
+        "filename": "ffc25af6-e27e-41bb-9911-b61872601b71.png",
+        "originalName": "Снимок экрана 2026-09-16 215737.png",
+        "size": 31074,
+        "mimetype": "image/png"
+      },
+      {
+        "id": "5c6rf",
+        "filename": "94d1abc1-548a-442d-a765-33c142c88937.jpg",
+        "originalName": "Снимок экрана 2026-09-18 215416.jpg",
+        "size": 304570,
+        "mimetype": "image/jpeg"
+      },
+      {
+        "id": "mfdj6",
+        "filename": "142bb239-3a71-43c0-9437-e1e01712dea7.jpg",
+        "originalName": "Снимок экрана 2026-09-18 220051.jpg",
+        "size": 308633,
+        "mimetype": "image/jpeg"
+      },
+      {
+        "id": "frdt5",
+        "filename": "8c38c71a-57ec-4beb-be68-878ef66b4d09.jpg",
+        "originalName": "Снимок экрана 2026-09-18 222302.jpg",
+        "size": 364219,
+        "mimetype": "image/jpeg"
+      },
+      {
+        "id": "beajv",
+        "filename": "588cc0dd-f029-44fd-bdcb-2594bcb7962e.jpg",
+        "originalName": "Снимок экрана 2026-09-18 223348.jpg",
+        "size": 370032,
+        "mimetype": "image/jpeg"
+      },
+      {
+        "id": "29mk7",
+        "filename": "631e1536-c8af-4207-9916-652d05d5ee59.jpg",
+        "originalName": "Снимок экрана 2026-09-18 224346.jpg",
+        "size": 376974,
+        "mimetype": "image/jpeg"
+      },
+      {
+        "id": "dq5e2",
+        "filename": "b16e4608-9175-4112-9507-601136a27243.jpg",
+        "originalName": "Снимок экрана 2026-09-19 113906.jpg",
+        "size": 288296,
+        "mimetype": "image/jpeg"
+      },
+      {
+        "id": "2puy6",
+        "filename": "4c88e497-d0dd-4885-a7fa-2e9a5636b44e.jpg",
+        "originalName": "Снимок экрана 2026-09-19 113923.jpg",
+        "size": 294595,
+        "mimetype": "image/jpeg"
+      },
+      {
+        "id": "rdx7r",
+        "filename": "f4a172cd-1173-4bce-a81a-2cdba1d4d0d9.jpg",
+        "originalName": "Снимок экрана 2026-09-19 131916.jpg",
+        "size": 447462,
+        "mimetype": "image/jpeg"
+      },
+      {
+        "id": "84c3r",
+        "filename": "e9c54a23-3b63-42d3-a592-52ea60cd3f55.jpg",
+        "originalName": "Снимок экрана 2026-09-19 134207.jpg",
+        "size": 485667,
+        "mimetype": "image/jpeg"
+      },
+      {
+        "id": "m2ja4",
+        "filename": "d1a89b09-2e06-4b9d-94f4-c0ca54dbc7d9.jpg",
+        "originalName": "Снимок экрана 2026-09-19 134349.jpg",
+        "size": 480308,
+        "mimetype": "image/jpeg"
+      },
+      {
+        "id": "sxnxe",
+        "filename": "6d4e4f11-e329-4df8-b9b6-34886dac4c3a.jpg",
+        "originalName": "Снимок экрана 2026-09-19 141418.jpg",
+        "size": 310042,
+        "mimetype": "image/jpeg"
+      },
+      {
+        "id": "k67dc",
+        "filename": "de2d199a-ad8f-4b26-a569-93793c7d4355.jpg",
+        "originalName": "Снимок экрана 2026-09-19 142444.jpg",
+        "size": 357116,
+        "mimetype": "image/jpeg"
+      },
+      {
+        "id": "7ehyd",
+        "filename": "8758625f-1971-41df-8865-f197b503a26e.jpg",
+        "originalName": "Снимок экрана 2026-09-19 151937.jpg",
+        "size": 246166,
+        "mimetype": "image/jpeg"
+      },
+      {
+        "id": "vc8zk",
+        "filename": "53c8acf2-3f11-4899-9dcc-bc15e16a3090.jpg",
+        "originalName": "Снимок экрана 2026-09-19 151950.jpg",
+        "size": 229243,
+        "mimetype": "image/jpeg"
+      },
+      {
+        "id": "yuvmu",
+        "filename": "82833f36-33c8-4f5b-adcf-38d96132f751.jpg",
+        "originalName": "Снимок экрана 2026-09-19 151953.jpg",
+        "size": 278241,
+        "mimetype": "image/jpeg"
+      },
+      {
+        "id": "smnc6",
+        "filename": "8031dc66-8f1a-42fb-9600-f3420ed175fe.jpg",
+        "originalName": "Снимок экрана 2026-09-19 152002.jpg",
+        "size": 279750,
+        "mimetype": "image/jpeg"
+      }
+    ],
+    "expiry": "once",
+    "expiresAt": null,
+    "passwordHash": null,
+    "uploadedAt": 1791020607834
+  },
+  "t5anj": {
+    "id": "t5anj",
+    "pin": "T5ANJ",
+    "type": "drop",
+    "title": "Drop-папка",
+    "ownerKey": "4ecf432094da9e1c5ae8a1fb1b30583f",
+    "files": [],
+    "expiry": "3days",
+    "expiresAt": 1791279940061,
+    "passwordHash": null,
+    "uploadedAt": 1791020740061
+  }
+}

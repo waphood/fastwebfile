@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FastWebFile — Панель Администратора</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    .admin-wrap {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 16px 16px 40px;
+    }
+    .admin-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .admin-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(91,106,240,0.15);
+      border: 1px solid rgba(91,106,240,0.35);
+      color: #90a0ff;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .admin-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+    @media (max-width: 680px) {
+      .admin-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    .stat-card {
+      background: var(--c1);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 14px;
+    }
+    .stat-card-label {
+      font-size: 11px;
+      color: var(--t3);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .stat-card-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--t1);
+      font-family: var(--mono);
+    }
+    .admin-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+    .admin-search-input {
+      flex: 1;
+      min-width: 180px;
+      padding: 8px 12px;
+      background: var(--c1);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--t1);
+      font-family: var(--font);
+      font-size: 12.5px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .admin-search-input:focus {
+      border-color: var(--accent);
+    }
+    .admin-select {
+      padding: 8px 12px;
+      background: var(--c1);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--t1);
+      font-family: var(--font);
+      font-size: 12px;
+      outline: none;
+      cursor: pointer;
+    }
+    .admin-table-card {
+      background: var(--c1);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+    .admin-files-list {
+      display: flex;
+      flex-direction: column;
+      divide-y: 1px solid var(--border);
+    }
+    .admin-file-row {
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.15s;
+    }
+    .admin-file-row:last-child {
+      border-bottom: none;
+    }
+    .admin-file-row:hover {
+      background: var(--c2);
+    }
+    .admin-file-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+      flex: 1;
+    }
+    .admin-file-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      background: var(--c3);
+      color: var(--t2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .admin-file-icon svg { width: 16px; height: 16px; }
+    .admin-file-info {
+      min-width: 0;
+    }
+    .admin-file-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--t1);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 320px;
+    }
+    .admin-file-meta {
+      font-size: 11px;
+      color: var(--t3);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 2px;
+      flex-wrap: wrap;
+    }
+    .admin-pin-badge {
+      font-family: var(--mono);
+      font-size: 10.5px;
+      font-weight: 700;
+      color: var(--accent);
+      background: var(--accent-dim);
+      border: 1px solid var(--accent-border);
+      padding: 1px 5px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .admin-type-badge {
+      font-family: var(--mono);
+      font-size: 9.5px;
+      padding: 1px 5px;
+      border-radius: 3px;
+      background: var(--c3);
+      color: var(--t2);
+    }
+    .admin-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .btn-adm {
+      padding: 6px 10px;
+      font-size: 11.5px;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      border: 1px solid transparent;
+      transition: all 0.15s;
+    }
+    .btn-adm-view {
+      background: var(--c3);
+      color: var(--t1);
+      border-color: var(--border);
+    }
+    .btn-adm-view:hover {
+      background: var(--c4);
+    }
+    .btn-adm-del {
+      background: rgba(240,96,96,0.12);
+      color: var(--red);
+      border-color: rgba(240,96,96,0.3);
+    }
+    .btn-adm-del:hover {
+      background: rgba(240,96,96,0.25);
+    }
+    .empty-state {
+      padding: 36px 16px;
+      text-align: center;
+      color: var(--t3);
+      font-size: 13px;
+    }
+    .unauth-card {
+      max-width: 420px;
+      margin: 80px auto;
+      text-align: center;
+      padding: 30px 20px;
+      background: var(--c1);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+    }
+  </style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-mark">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M3 8h10M8 3l5 5-5 5" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <a href="/" class="logo-name">Fast<span>Web</span>File</a>
+      <span class="logo-tag">ADM</span>
+    </div>
+    <div class="main-mode-nav-wrap">
+      <span class="admin-badge">
+        <svg viewBox="0 0 14 14" fill="none" style="width:12px;height:12px"><path d="M7 1l2 3.5 4 .5-3 3 1 4-4-2-4 2 1-4-3-3 4-.5L7 1z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
+        Модерация
+      </span>
+    </div>
+    <div class="header-status">
+      <a href="/" class="bl-back">
+        <svg viewBox="0 0 12 12" fill="none"><path d="M8 1L3 6l5 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        На сайт
+      </a>
+    </div>
+  </div>
+</header>
+
+<div class="admin-wrap" id="mainAdminView" hidden>
+
+  <div class="admin-header-row">
+    <div>
+      <h1 style="font-size:18px;font-weight:700;color:var(--t1);margin-bottom:2px;">Управление файлами</h1>
+      <p style="font-size:12px;color:var(--t3);">Администратор ID: <span id="adminIdDisplay" style="color:var(--accent);font-family:var(--mono);">7936378054</span></p>
+    </div>
+    <div style="display:flex;gap:6px;">
+      <button type="button" class="btn-adm btn-adm-view" id="btnRefresh">
+        <svg viewBox="0 0 14 14" fill="none" style="width:12px;height:12px"><path d="M12.5 7A5.5 5.5 0 112 7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M13 3v4.5H8.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Обновить
+      </button>
+      <button type="button" class="btn-adm btn-adm-del" id="btnCleanExpired">
+        <svg viewBox="0 0 14 14" fill="none" style="width:12px;height:12px"><path d="M2 3.5h10M5 3.5V2a1 1 0 011-1h2a1 1 0 011 1v1.5M11.5 3.5v8a1.5 1.5 0 01-1.5 1.5h-6A1.5 1.5 0 012.5 11.5v-8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        Очистить истекшие
+      </button>
+    </div>
+  </div>
+
+  <!-- Stats Grid -->
+  <div class="admin-stats-grid">
+    <div class="stat-card">
+      <div class="stat-card-label">Всего записей</div>
+      <div class="stat-card-value" id="statEntries">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-label">Занято на диске</div>
+      <div class="stat-card-value" id="statSize">0 МБ</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-label">Всего файлов</div>
+      <div class="stat-card-value" id="statFiles">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-label">Drop-папок</div>
+      <div class="stat-card-value" id="statDrops">0</div>
+    </div>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="admin-toolbar">
+    <input type="text" class="admin-search-input" id="searchInput" placeholder="Поиск по имени, PIN или ID..." />
+    <select class="admin-select" id="filterSelect">
+      <option value="all">Все файлы</option>
+      <option value="file">Обычные файлы</option>
+      <option value="bundle">Бандлы</option>
+      <option value="drop">Drop-папки</option>
+      <option value="expired">Истекшие</option>
+    </select>
+  </div>
+
+  <!-- Files List Card -->
+  <div class="admin-table-card">
+    <div class="admin-files-list" id="filesListContainer">
+      <div class="empty-state">Загрузка файлов...</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Unauthenticated Fallback Card -->
+<div class="unauth-card" id="unauthCard" hidden>
+  <div style="font-size:36px;margin-bottom:12px;">🔒</div>
+  <h2 style="font-size:16px;font-weight:700;color:var(--t1);margin-bottom:6px;">Доступ ограничен</h2>
+  <p style="font-size:12px;color:var(--t3);line-height:1.45;margin-bottom:16px;">
+    Эта панель доступна только администратору сервиса FastWebFile. Откройте ее через команду <code>/adm</code> в боте <b>@fastwebfilebot</b>.
+  </p>
+  <a href="https://t.me/fastwebfilebot" class="btn-upload" style="text-decoration:none;display:inline-flex;">
+    Перейти к боту @fastwebfilebot
+  </a>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// Telegram WebApp Setup
+const tg = window.Telegram?.WebApp;
+if (tg) {
+  tg.ready();
+  tg.expand();
+}
+
+const params = new URLSearchParams(window.location.search);
+const adminToken = params.get('token') || localStorage.getItem('fwf_admin_token') || '';
+const initData = tg?.initData || '';
+
+let allItems = [];
+
+async function initAdmin() {
+  if (adminToken) localStorage.setItem('fwf_admin_token', adminToken);
+
+  try {
+    const headers = {};
+    if (adminToken) headers['x-admin-token'] = adminToken;
+    if (initData) headers['x-telegram-init-data'] = initData;
+
+    const res = await fetch('/api/admin/files', { headers });
+    if (!res.ok) {
+      showUnauth();
+      return;
+    }
+    const data = await res.json();
+    allItems = data.files || [];
+    renderStats(data.stats);
+    renderList();
+    document.getElementById('mainAdminView').hidden = false;
+  } catch (err) {
+    showUnauth();
+  }
+}
+
+function showUnauth() {
+  document.getElementById('mainAdminView').hidden = true;
+  document.getElementById('unauthCard').hidden = false;
+}
+
+function renderStats(s) {
+  if (!s) return;
+  document.getElementById('statEntries').textContent = s.totalEntries || 0;
+  document.getElementById('statSize').textContent = (s.totalSizeMb || 0) + ' МБ';
+  document.getElementById('statFiles').textContent = s.totalFiles || 0;
+  document.getElementById('statDrops').textContent = s.dropCount || 0;
+}
+
+function renderList() {
+  const container = document.getElementById('filesListContainer');
+  const q = document.getElementById('searchInput').value.toLowerCase().trim();
+  const filter = document.getElementById('filterSelect').value;
+
+  const now = Date.now();
+  let list = allItems.filter(item => {
+    if (filter === 'expired') {
+      if (!item.expiresAt || item.expiresAt > now) return false;
+    } else if (filter !== 'all') {
+      if (item.type !== filter) return false;
+    }
+
+    if (!q) return true;
+    const nameMatch = (item.title || item.originalName || '').toLowerCase().includes(q);
+    const pinMatch = (item.pin || '').toLowerCase().includes(q);
+    const idMatch = (item.id || '').toLowerCase().includes(q);
+    return nameMatch || pinMatch || idMatch;
+  });
+
+  if (list.length === 0) {
+    container.innerHTML = '<div class="empty-state">Файлы не найдены</div>';
+    return;
+  }
+
+  container.innerHTML = list.map(item => {
+    const isExpired = item.expiresAt && item.expiresAt <= now;
+    const sizeStr = item.size ? formatBytes(item.size) : (item.files ? `${item.files.length} ф.` : '');
+    const title = item.title || item.originalName || item.id;
+    const pin = item.pin || item.id.toUpperCase();
+    const link = item.type === 'bundle' ? `/b/${item.id}` : (item.type === 'drop' ? `/drop/${item.id}` : `/f/${item.id}`);
+
+    let typeTag = item.type === 'bundle' ? 'БАНДЛ' : (item.type === 'drop' ? 'DROP' : 'ФАЙЛ');
+    let expiryStr = '';
+    if (isExpired) {
+      expiryStr = '<span style="color:var(--red);">Истек</span>';
+    } else if (item.maxDownloads === 1) {
+      expiryStr = `<span style="color:var(--amber);">1 скачивание (${item.downloads || 0}/1)</span>`;
+    } else if (item.expiresAt) {
+      const leftH = Math.max(0, Math.round((item.expiresAt - now) / 3600000));
+      expiryStr = `<span>Осталось ~${leftH} ч.</span>`;
+    }
+
+    return `
+      <div class="admin-file-row">
+        <div class="admin-file-left">
+          <div class="admin-file-icon">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M3 2a1 1 0 011-1h5.5l3.5 3.5V14a1 1 0 01-1 1H4a1 1 0 01-1-1V2z" stroke="currentColor" stroke-width="1.3"/><path d="M9 1v4h4" stroke="currentColor" stroke-width="1.3"/></svg>
+          </div>
+          <div class="admin-file-info">
+            <div class="admin-file-title" title="${escapeHtml(title)}">${escapeHtml(title)}</div>
+            <div class="admin-file-meta">
+              <span class="admin-type-badge">${typeTag}</span>
+              <span class="admin-pin-badge" onclick="copyText('${pin}')" title="Кликните, чтобы скопировать PIN">PIN: ${pin}</span>
+              <span>${sizeStr}</span>
+              <span>·</span>
+              ${expiryStr}
+              ${item.hasPassword ? '<span style="color:var(--amber);">🔒 Пароль</span>' : ''}
+              ${item.shredded ? '<span style="color:var(--green);">🛡 EXIF</span>' : ''}
+            </div>
+          </div>
+        </div>
+        <div class="admin-actions">
+          <a href="${link}" target="_blank" class="btn-adm btn-adm-view" title="Открыть страницу файла">
+            <svg viewBox="0 0 14 14" fill="none" style="width:11px;height:11px"><path d="M1 7s2.5-4 6-4 6 4 6 4-2.5 4-6 4-6-4-6-4z" stroke="currentColor" stroke-width="1.3"/><circle cx="7" cy="7" r="1.5" stroke="currentColor" stroke-width="1.3"/></svg>
+            Открыть
+          </a>
+          <button type="button" class="btn-adm btn-adm-del" onclick="deleteFile('${item.id}', '${escapeHtml(title)}')" title="Удалить с диска и базы">
+            <svg viewBox="0 0 14 14" fill="none" style="width:11px;height:11px"><path d="M2 3.5h10M5 3.5V2a1 1 0 011-1h2a1 1 0 011 1v1.5M11.5 3.5v8a1.5 1.5 0 01-1.5 1.5h-6A1.5 1.5 0 012.5 11.5v-8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+            Удалить
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+async function deleteFile(id, name) {
+  if (!confirm(`Удалить файл "${name}" с сервера навсегда?`)) return;
+
+  const headers = {};
+  if (adminToken) headers['x-admin-token'] = adminToken;
+  if (initData) headers['x-telegram-init-data'] = initData;
+
+  try {
+    const res = await fetch(`/api/admin/files/${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+      headers
+    });
+    const d = await res.json();
+    if (d.ok) {
+      showToast('Файл успешно удален с сервера');
+      allItems = allItems.filter(f => f.id !== id);
+      renderList();
+    } else {
+      showToast('Ошибка удаления: ' + (d.error || ''));
+    }
+  } catch (e) {
+    showToast('Сетевая ошибка');
+  }
+}
+
+async function cleanExpired() {
+  if (!confirm('Очистить все истекшие файлы прямо сейчас?')) return;
+  const headers = {};
+  if (adminToken) headers['x-admin-token'] = adminToken;
+  if (initData) headers['x-telegram-init-data'] = initData;
+
+  try {
+    const res = await fetch('/api/admin/clean-expired', { method: 'POST', headers });
+    const d = await res.json();
+    showToast(`Очищено файлов: ${d.cleaned || 0}`);
+    initAdmin();
+  } catch (e) {
+    showToast('Ошибка очистки');
+  }
+}
+
+function copyText(txt) {
+  navigator.clipboard.writeText(txt).then(() => showToast('PIN скопирован: ' + txt));
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function formatBytes(bytes) {
+  if (!bytes) return '0 B';
+  const k = 1024;
+  const sizes = ['B', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+}
+
+function escapeHtml(s) {
+  return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+document.getElementById('searchInput').addEventListener('input', renderList);
+document.getElementById('filterSelect').addEventListener('change', renderList);
+document.getElementById('btnRefresh').addEventListener('click', initAdmin);
+document.getElementById('btnCleanExpired').addEventListener('click', cleanExpired);
+
+initAdmin();
+</script>
+</body>
+</html>

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Файл недоступен — FastWebFile</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/style.css" />
+  <style>
+    .err-wrap {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      position: relative;
+      z-index: 1;
+    }
+    .err-card {
+      background: var(--c1);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 36px 28px;
+      max-width: 380px;
+      width: 100%;
+      text-align: center;
+    }
+    .err-icon {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--c2);
+      border: 1px solid var(--border-light);
+      border-radius: 16px;
+      color: var(--t3);
+    }
+    .err-icon svg { width: 28px; height: 28px; }
+    .err-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--t1);
+      margin-bottom: 8px;
+    }
+    .err-desc {
+      font-size: 13px;
+      color: var(--t3);
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+    .err-reasons {
+      background: var(--c2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 14px;
+      text-align: left;
+      margin-bottom: 24px;
+    }
+    .err-reasons p {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--t3);
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      margin-bottom: 8px;
+    }
+    .err-reasons ul { list-style: none; display: flex; flex-direction: column; gap: 5px; }
+    .err-reasons li { font-size: 12px; color: var(--t2); display: flex; align-items: center; gap: 7px; }
+    .err-reasons li::before { content: '—'; color: var(--t3); flex-shrink: 0; }
+    .err-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      width: 100%;
+      padding: 11px;
+      border: none;
+      border-radius: var(--radius);
+      background: var(--accent);
+      color: #fff;
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: opacity 0.15s;
+    }
+    .err-btn:hover { opacity: 0.85; }
+  </style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-mark">
+        <svg viewBox="0 0 16 16" fill="none">
+          <path d="M3 8h10M8 3l5 5-5 5" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <a href="/" style="text-decoration:none;color:inherit;" class="logo-name">Fast<span>Web</span>File</a>
+    </div>
+    <div class="main-mode-nav-wrap">
+      <nav class="main-mode-nav">
+        <a href="/" class="mode-nav-btn">
+          <svg viewBox="0 0 16 16" fill="none"><path d="M2 3a1 1 0 011-1h4l2 2h4a1 1 0 011 1v7a1 1 0 01-1 1H3a1 1 0 01-1-1V3z" stroke="currentColor" stroke-width="1.3"/></svg>
+          <span>Файлы</span>
+        </a>
+        <a href="/?drop=1" class="mode-nav-btn">
+          <svg viewBox="0 0 16 16" fill="none"><path d="M8 2L2 5.5v5l6 3.5 6-3.5v-5L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M2 5.5l6 3.5 6-3.5M8 9v5" stroke="currentColor" stroke-width="1.3"/></svg>
+          <span>Drop-папка (сбор)</span>
+        </a>
+        <a href="/p2p" class="mode-nav-btn">
+          <svg viewBox="0 0 16 16" fill="none"><path d="M8.5 1.5L2.5 9h5.5l-1 5.5 6.5-8H8l.5-5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+          <span>P2P (50 ГБ+)</span>
+        </a>
+      </nav>
+    </div>
+    <div class="header-status">
+      <a href="/" class="bl-back">
+        <svg viewBox="0 0 12 12" fill="none"><path d="M8 1L3 6l5 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        На главную
+      </a>
+    </div>
+  </div>
+</header>
+
+<div class="err-wrap">
+  <div class="err-card">
+    <div class="err-icon">
+      <svg viewBox="0 0 20 20" fill="none"><path d="M4 4h12v12a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" stroke="currentColor" stroke-width="1.4"/><path d="M8 8h4M8 11h3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="15" cy="15" r="3" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M17.5 17.5l-1.5-1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+    </div>
+    <h1 class="err-title">Файл не найден</h1>
+    <p class="err-desc">Этот файл больше не доступен для скачивания.</p>
+    <div class="err-reasons">
+      <p>Возможные причины</p>
+      <ul>
+        <li>Уже скачан (режим «1 раз»)</li>
+        <li>Истёк срок хранения</li>
+        <li>Ссылка неверная</li>
+      </ul>
+    </div>
+    <a href="/" class="err-btn">Загрузить новый файл</a>
+  </div>
+</div>
+
+</body>
+</html>

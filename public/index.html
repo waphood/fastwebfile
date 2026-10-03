@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FastWebFile — Обмен файлами</title>
+  <meta name="description" content="Загрузи файлы, получи ссылку и QR-код. Без регистрации. Удаляется автоматически." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-mark">
+        <svg viewBox="0 0 16 16" fill="none">
+          <path d="M3 8h10M8 3l5 5-5 5" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <a href="/" style="text-decoration:none;color:inherit;" class="logo-name">Fast<span>Web</span>File</a>
+      <span class="logo-tag">FWF</span>
+    </div>
+    <div class="main-mode-nav-wrap">
+      <nav class="main-mode-nav">
+        <a href="/" class="mode-nav-btn active">
+          <svg viewBox="0 0 16 16" fill="none"><path d="M2 3a1 1 0 011-1h4l2 2h4a1 1 0 011 1v7a1 1 0 01-1 1H3a1 1 0 01-1-1V3z" stroke="currentColor" stroke-width="1.3"/></svg>
+          <span>Файлы</span>
+        </a>
+        <button type="button" class="mode-nav-btn" id="openDropModalBtn">
+          <svg viewBox="0 0 16 16" fill="none"><path d="M8 2L2 5.5v5l6 3.5 6-3.5v-5L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M2 5.5l6 3.5 6-3.5M8 9v5" stroke="currentColor" stroke-width="1.3"/></svg>
+          <span>Drop-папка (сбор)</span>
+        </button>
+        <a href="/p2p" class="mode-nav-btn">
+          <svg viewBox="0 0 16 16" fill="none"><path d="M8.5 1.5L2.5 9h5.5l-1 5.5 6.5-8H8l.5-5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+          <span>P2P (50 ГБ+)</span>
+        </a>
+      </nav>
+    </div>
+    <div class="header-spacer"></div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <section class="hero anim">
+    <h1>Поделись файлом <em>за секунду</em></h1>
+    <p>Загружай файлы, выбирай срок хранения — получай ссылку, QR-код и быстрый PIN. Без регистрации.</p>
+  </section>
+
+  <!-- ── Quick Receive PIN bar (SendAnywhere style) ── -->
+  <div class="receive-card anim anim-d1" id="receiveCard">
+    <div class="receive-card-inner">
+      <div class="receive-info">
+        <div class="receive-icon">
+          <svg viewBox="0 0 20 20" fill="none"><path d="M10 3v10M10 13l-3-3M10 13l3-3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 14v2a1 1 0 001 1h10a1 1 0 001-1v-2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </div>
+        <div>
+          <span class="receive-title">Получить по коду</span>
+          <span class="receive-sub">Введи 5 знаков (буквы и цифры)</span>
+        </div>
+      </div>
+      <div class="receive-form">
+        <div class="pin-inputs" id="pinInputs">
+          <input type="text" maxlength="1" class="pin-digit-input" data-idx="0" autocomplete="off" autocapitalize="characters" />
+          <input type="text" maxlength="1" class="pin-digit-input" data-idx="1" autocomplete="off" autocapitalize="characters" />
+          <input type="text" maxlength="1" class="pin-digit-input" data-idx="2" autocomplete="off" autocapitalize="characters" />
+          <input type="text" maxlength="1" class="pin-digit-input" data-idx="3" autocomplete="off" autocapitalize="characters" />
+          <input type="text" maxlength="1" class="pin-digit-input" data-idx="4" autocomplete="off" autocapitalize="characters" />
+        </div>
+        <button type="button" class="btn-receive" id="btnReceive">
+          <span>Найти</span>
+          <svg viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="receive-msg" id="receiveMsg" hidden></div>
+  </div>
+
+  <!-- ── Upload card ── -->
+  <div class="card anim anim-d2" id="uploadCard">
+    <div class="card-header">
+      <span class="card-title">Загрузка файлов</span>
+      <div class="expiry-tabs" id="expiryTabs">
+        <button class="expiry-tab active" data-value="once">1 раз</button>
+        <button class="expiry-tab" data-value="1day">1 день</button>
+        <button class="expiry-tab" data-value="3days">3 дня</button>
+      </div>
+    </div>
+    <div class="card-body">
+
+      <!-- Options bar: Bundle toggle + Subtle pills for Password, Note, Compression -->
+      <div class="options-bar">
+        <div class="bundle-row">
+          <label class="toggle-wrap" for="bundleToggle">
+            <input type="checkbox" id="bundleToggle" class="toggle-input" />
+            <span class="toggle-track">
+              <span class="toggle-thumb"></span>
+            </span>
+            <span class="toggle-label">Объединить в одну ссылку</span>
+          </label>
+          <span class="bundle-hint" id="bundleHint">Каждый файл — своя ссылка</span>
+        </div>
+
+        <div class="options-pills-row">
+          <!-- Password subtle pill & drawer -->
+          <div class="pwd-option-wrap" id="pwdOptionWrap">
+            <button type="button" class="btn-opt-pill" id="pwdPillBtn" title="Защитить скачивание паролем">
+              <svg viewBox="0 0 16 16" fill="none"><rect x="3" y="7" width="10" height="7" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M5.5 7V5a2.5 2.5 0 015 0v2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+              <span id="pwdPillLabel">Пароль</span>
+              <span class="opt-status-dot" id="pwdStatusDot" hidden></span>
+            </button>
+
+            <div class="pwd-drawer" id="pwdDrawer" hidden>
+              <div class="pwd-drawer-inner">
+                <input
+                  type="text"
+                  id="passwordInput"
+                  class="password-input"
+                  placeholder="Задай пароль"
+                  autocomplete="off"
+                  autocorrect="off"
+                  autocapitalize="off"
+                  spellcheck="false"
+                  name="fwf_token_field"
+                  data-lpignore="true"
+                  data-1p-ignore="true"
+                  data-form-type="other"
+                  style="-webkit-text-security: disc; text-security: disc;"
+                />
+                <button type="button" class="password-toggle" id="passwordToggle" title="Показать/скрыть">
+                  <svg id="eyeIcon" viewBox="0 0 16 16" fill="none"><ellipse cx="8" cy="8" rx="6" ry="4" stroke="currentColor" stroke-width="1.3"/><circle cx="8" cy="8" r="1.8" stroke="currentColor" stroke-width="1.2"/></svg>
+                </button>
+                <button type="button" class="password-clear" id="passwordClear" title="Убрать пароль">
+                  <svg viewBox="0 0 14 14" fill="none"><path d="M3 3l8 8M11 3L3 11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Note/Description subtle pill & drawer -->
+          <div class="note-option-wrap" id="noteOptionWrap">
+            <button type="button" class="btn-opt-pill" id="notePillBtn" title="Добавить текстовое описание к файлам">
+              <svg viewBox="0 0 16 16" fill="none"><path d="M3 3h10M3 7h10M3 11h6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><rect x="2" y="1.5" width="12" height="13" rx="1.5" stroke="currentColor" stroke-width="1.2"/></svg>
+              <span id="notePillLabel">Описание</span>
+              <span class="opt-status-dot" id="noteStatusDot" hidden></span>
+            </button>
+
+            <div class="note-drawer" id="noteDrawer" hidden>
+              <div class="note-drawer-inner">
+                <textarea id="noteInput" class="note-textarea" rows="2" maxlength="500" placeholder="Заметка получателю (необязательно)..."></textarea>
+                <button type="button" class="note-clear" id="noteClear" title="Очистить заметку">
+                  <svg viewBox="0 0 14 14" fill="none"><path d="M3 3l8 8M11 3L3 11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Compress Photos Toggle Pill -->
+          <div class="compress-option-wrap">
+            <button type="button" class="btn-opt-pill is-active" id="compressPillBtn" title="Сжатие фото перед загрузкой (ускоряет передачу)">
+              <svg viewBox="0 0 16 16" fill="none"><path d="M8.5 1.5L2.5 9h5.5l-1 5.5 6.5-8H8l.5-5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+              <span>Сжатие фото</span>
+              <span class="opt-tag" id="compressTag">ВКЛ</span>
+            </button>
+          </div>
+
+          <!-- Metadata Shredder (EXIF) Toggle Pill -->
+          <div class="shred-option-wrap">
+            <button type="button" class="btn-opt-pill is-active" id="shredPillBtn" title="Очистка EXIF-тегов, геопозиции (GPS) и данных камеры">
+              <svg viewBox="0 0 16 16" fill="none"><path d="M8 1.5l6 2.5v5c0 3.5-2.5 5.5-6 6.5-3.5-1-6-3-6-6.5v-5l6-2.5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M6 8l1.5 1.5L10.5 6.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span>Шредер EXIF</span>
+              <span class="opt-tag" id="shredTag">ВКЛ</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Drop zone -->
+      <div class="dropzone" id="dropzone">
+        <div class="drop-icon">
+          <svg viewBox="0 0 20 20" fill="none">
+            <path d="M10 13V4M10 4L7 7M10 4l3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M4 14v1a2 2 0 002 2h8a2 2 0 002-2v-1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <p class="drop-label"><span>Выбери файлы</span> или перетащи сюда</p>
+        <p class="drop-hint">До 20 файлов · Максимум 500 МБ каждый · Любой формат</p>
+        <input type="file" class="drop-input" id="fileInput" multiple />
+      </div>
+
+      <!-- Selected files list -->
+      <div class="file-list" id="fileList"></div>
+
+      <!-- Upload button -->
+      <div style="margin-top:12px; display:flex; flex-direction:column; gap:6px;">
+        <button class="btn-upload" id="uploadBtn" disabled>
+          <svg viewBox="0 0 20 20" fill="none">
+            <path d="M10 13V4M10 4L7 7M10 4l3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M4 14v1a2 2 0 002 2h8a2 2 0 002-2v-1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+          <span id="uploadBtnText">Загрузить</span>
+        </button>
+        <div class="progress-block" id="progressBlock" hidden>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+            <span class="progress-label" id="progressLabel">0%</span>
+            <span class="progress-speed" id="progressSpeed"></span>
+            <button type="button" class="btn-pause-resume" id="btnPauseResume" hidden>Пауза</button>
+          </div>
+          <div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── Results card ── -->
+  <div class="card anim" id="resultCard" hidden style="margin-top:16px;">
+    <div class="results-header">
+      <div class="results-ok-icon">
+        <svg viewBox="0 0 12 12" fill="none">
+          <path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <span class="results-title">Файлы загружены</span>
+      <span class="results-count" id="resultsCount">0 файлов</span>
+      <div class="results-badges-group">
+        <span class="results-pwd-badge" id="resultsPwdBadge" hidden>
+          <svg viewBox="0 0 12 12" fill="none"><rect x="2" y="5.5" width="8" height="5" rx="1" stroke="currentColor" stroke-width="1.2"/><path d="M4 5.5V4a2 2 0 014 0v1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          С паролем
+        </span>
+        <span class="results-note-badge" id="resultsNoteBadge" hidden>
+          <svg viewBox="0 0 12 12" fill="none"><path d="M2 2h8M2 5h8M2 8h5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          С заметкой
+        </span>
+        <span class="results-expiry-badge" id="resultsExpiry"></span>
+      </div>
+    </div>
+    <div class="result-list" id="resultList"></div>
+    <div class="results-footer">
+      <button class="btn-ghost" id="copyAllBtn">
+        <svg viewBox="0 0 16 16" fill="none"><rect x="3" y="5" width="8" height="9" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M5 5V4a1 1 0 011-1h6a1 1 0 011 1v8a1 1 0 01-1 1h-1" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        Скопировать все
+      </button>
+      <button class="btn-solid" id="newUploadBtn">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        Новая загрузка
+      </button>
+    </div>
+  </div>
+
+  <!-- ── How it works ── -->
+  <div class="info-strip anim anim-d2">
+    <div class="info-item">
+      <p class="info-num">01</p>
+      <h3>Загрузи файлы</h3>
+      <p>Перетащи или выбери. Можно сразу несколько.</p>
+    </div>
+    <div class="info-item">
+      <p class="info-num">02</p>
+      <h3>Выбери срок</h3>
+      <p>1 раз — удалится после скачивания. 1 или 3 дня — по таймеру.</p>
+    </div>
+    <div class="info-item">
+      <p class="info-num">03</p>
+      <h3>Поделись</h3>
+      <p>Ссылку или QR-код — получатель скачает мгновенно.</p>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── Create Drop-Folder Modal ── -->
+<div class="preview-overlay" id="dropModal" hidden>
+  <div class="preview-modal" style="max-width:440px;">
+    <div class="preview-header">
+      <span class="preview-title">Создать Drop-папку (Сбор файлов)</span>
+      <button type="button" class="preview-close" id="closeDropModalBtn">
+        <svg viewBox="0 0 14 14" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="card-body" style="padding:18px;">
+      <p style="font-size:12px;color:var(--t3);margin-bottom:12px;line-height:1.45;">Создай ссылку-копилку и отправь её клиентам или друзьям. Они смогут загружать файлы прямо тебе без регистрации.</p>
+      <div style="margin-bottom:12px;">
+        <label style="display:block;font-size:11px;color:var(--t2);margin-bottom:5px;font-weight:600;">Название папки</label>
+        <input type="text" id="dropTitleInput" class="sender-name-input" placeholder="Например: Фото с корпоратива или Документы" maxlength="100" />
+      </div>
+      <div style="margin-bottom:16px;">
+        <label style="display:block;font-size:11px;color:var(--t2);margin-bottom:5px;font-weight:600;">Срок действия</label>
+        <div class="expiry-tabs" id="dropExpiryTabs" style="display:flex;">
+          <button type="button" class="expiry-tab" data-val="1day">1 день</button>
+          <button type="button" class="expiry-tab active" data-val="3days">3 дня</button>
+        </div>
+      </div>
+      <button class="btn-upload" id="btnSubmitCreateDrop" style="margin-top:4px;">
+        <span>Создать Drop-папку</span>
+        <svg viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
