@@ -116,6 +116,12 @@ if (openDropModalBtn) {
   openDropModalBtn.addEventListener('click', () => {
     dropModal.removeAttribute('hidden');
     dropTitleInput.focus();
+    setTimeout(() => {
+      if (window.initIosSegmentedControl && dropExpiryTabs) {
+        window.initIosSegmentedControl(dropExpiryTabs);
+        if (dropExpiryTabs._updateThumb) dropExpiryTabs._updateThumb();
+      }
+    }, 60);
   });
 }
 if (closeDropModalBtn) {
@@ -134,16 +140,22 @@ if (dropModal) {
   });
   if (window.location.search.includes('drop=1')) {
     dropModal.removeAttribute('hidden');
-    setTimeout(() => { if (dropTitleInput) dropTitleInput.focus(); }, 100);
+    setTimeout(() => {
+      if (dropTitleInput) dropTitleInput.focus();
+      if (window.initIosSegmentedControl && dropExpiryTabs) {
+        window.initIosSegmentedControl(dropExpiryTabs);
+        if (dropExpiryTabs._updateThumb) dropExpiryTabs._updateThumb();
+      }
+    }, 100);
   }
 }
 if (dropExpiryTabs) {
-  dropExpiryTabs.querySelectorAll('.expiry-tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-      dropExpiryTabs.querySelectorAll('.expiry-tab').forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-      selectedDropExpiry = tab.dataset.val || '3days';
-    });
+  dropExpiryTabs.addEventListener('click', e => {
+    const tab = e.target.closest('.expiry-tab');
+    if (!tab) return;
+    dropExpiryTabs.querySelectorAll('.expiry-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    selectedDropExpiry = tab.dataset.val || '3days';
   });
 }
 if (btnSubmitCreateDrop) {

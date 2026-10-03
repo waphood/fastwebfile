@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>FastWebFile — Панель Администратора</title>
+  <title>FastWebFile — Панель Управления (Admin)</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -12,16 +12,16 @@
   <script src="/tg-init.js"></script>
   <style>
     .admin-wrap {
-      max-width: 900px;
+      max-width: 940px;
       margin: 0 auto;
-      padding: 16px 16px 40px;
+      padding: 12px 14px 48px;
     }
     .admin-header-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       flex-wrap: wrap;
     }
     .admin-badge {
@@ -36,11 +36,46 @@
       font-size: 11px;
       font-weight: 600;
     }
+    .status-live-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 8px var(--green);
+      display: inline-block;
+    }
+    .admin-quick-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .btn-header-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--c2);
+      border: 1px solid var(--border);
+      color: var(--t1);
+      padding: 6px 11px;
+      border-radius: 7px;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-header-action:hover {
+      background: var(--c3);
+      border-color: var(--accent-border);
+    }
+    .btn-header-action svg { width: 13px; height: 13px; }
+
+    /* Stats Grid */
     .admin-stats-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 10px;
-      margin-bottom: 18px;
+      margin-bottom: 16px;
     }
     @media (max-width: 680px) {
       .admin-stats-grid {
@@ -51,32 +86,69 @@
       background: var(--c1);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 12px 14px;
+      padding: 11px 13px;
     }
     .stat-card-label {
-      font-size: 11px;
+      font-size: 10.5px;
       color: var(--t3);
       text-transform: uppercase;
       letter-spacing: 0.5px;
       font-weight: 600;
-      margin-bottom: 4px;
+      margin-bottom: 3px;
     }
     .stat-card-value {
-      font-size: 20px;
+      font-size: 19px;
       font-weight: 700;
       color: var(--t1);
       font-family: var(--mono);
     }
+
+    /* iOS Draggable Navigation Tabs */
+    .admin-nav-tabs-wrap {
+      margin-bottom: 14px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .admin-nav-tabs {
+      width: 100%;
+      min-width: 320px;
+    }
+
+    /* Views */
+    .admin-view-section { display: none; }
+    .admin-view-section.active { display: block; }
+
+    /* Bulk toolbar */
+    .bulk-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background: rgba(91,106,240,0.12);
+      border: 1px solid rgba(91,106,240,0.3);
+      border-radius: var(--radius);
+      padding: 8px 14px;
+      margin-bottom: 12px;
+      font-size: 12px;
+      flex-wrap: wrap;
+    }
+    .bulk-bar-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    /* Filter Toolbar */
     .admin-toolbar {
       display: flex;
       align-items: center;
       gap: 8px;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
       flex-wrap: wrap;
     }
     .admin-search-input {
       flex: 1;
-      min-width: 180px;
+      min-width: 170px;
       padding: 8px 12px;
       background: var(--c1);
       border: 1px solid var(--border);
@@ -87,20 +159,9 @@
       outline: none;
       transition: border-color 0.15s;
     }
-    .admin-search-input:focus {
-      border-color: var(--accent);
-    }
-    .admin-select {
-      padding: 8px 12px;
-      background: var(--c1);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      color: var(--t1);
-      font-family: var(--font);
-      font-size: 12px;
-      outline: none;
-      cursor: pointer;
-    }
+    .admin-search-input:focus { border-color: var(--accent); }
+
+    /* Table / Card List */
     .admin-table-card {
       background: var(--c1);
       border: 1px solid var(--border);
@@ -110,23 +171,20 @@
     .admin-files-list {
       display: flex;
       flex-direction: column;
-      divide-y: 1px solid var(--border);
     }
     .admin-file-row {
-      padding: 12px 16px;
+      padding: 10px 14px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 12px;
+      gap: 10px;
       border-bottom: 1px solid var(--border);
       transition: background 0.15s;
     }
-    .admin-file-row:last-child {
-      border-bottom: none;
-    }
-    .admin-file-row:hover {
-      background: var(--c2);
-    }
+    .admin-file-row:last-child { border-bottom: none; }
+    .admin-file-row:hover { background: var(--c2); }
+    .admin-file-row.selected { background: rgba(91,106,240,0.08); }
+
     .admin-file-left {
       display: flex;
       align-items: center;
@@ -134,10 +192,17 @@
       min-width: 0;
       flex: 1;
     }
+    .admin-checkbox {
+      width: 17px;
+      height: 17px;
+      accent-color: var(--accent);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
     .admin-file-icon {
-      width: 34px;
-      height: 34px;
-      border-radius: 8px;
+      width: 32px;
+      height: 32px;
+      border-radius: 7px;
       background: var(--c3);
       color: var(--t2);
       display: flex;
@@ -145,95 +210,239 @@
       justify-content: center;
       flex-shrink: 0;
     }
-    .admin-file-icon svg { width: 16px; height: 16px; }
-    .admin-file-info {
-      min-width: 0;
-    }
+    .admin-file-icon svg { width: 15px; height: 15px; }
+
+    .admin-file-info { min-width: 0; flex: 1; }
     .admin-file-title {
-      font-size: 13px;
+      font-size: 12.5px;
       font-weight: 600;
       color: var(--t1);
-      white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      max-width: 320px;
+      white-space: nowrap;
+      margin-bottom: 2px;
+      cursor: pointer;
     }
+    .admin-file-title:hover { color: var(--accent); }
+
     .admin-file-meta {
-      font-size: 11px;
-      color: var(--t3);
       display: flex;
       align-items: center;
-      gap: 8px;
-      margin-top: 2px;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--t3);
       flex-wrap: wrap;
     }
     .admin-pin-badge {
       font-family: var(--mono);
-      font-size: 10.5px;
-      font-weight: 700;
-      color: var(--accent);
-      background: var(--accent-dim);
-      border: 1px solid var(--accent-border);
-      padding: 1px 5px;
+      background: var(--c3);
+      color: #abb2ff;
+      border: 1px solid var(--border);
       border-radius: 4px;
+      padding: 1px 5px;
+      font-weight: 600;
       cursor: pointer;
     }
     .admin-type-badge {
-      font-family: var(--mono);
       font-size: 9.5px;
+      font-weight: 700;
+      text-transform: uppercase;
       padding: 1px 5px;
-      border-radius: 3px;
-      background: var(--c3);
+      border-radius: 4px;
+      background: rgba(255,255,255,0.06);
       color: var(--t2);
     }
     .admin-actions {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
       flex-shrink: 0;
     }
     .btn-adm {
-      padding: 6px 10px;
-      font-size: 11.5px;
-      font-weight: 600;
+      padding: 5px 9px;
       border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
       cursor: pointer;
+      border: 1px solid var(--border);
+      background: var(--c2);
+      color: var(--t1);
       display: inline-flex;
       align-items: center;
       gap: 4px;
-      border: 1px solid transparent;
       transition: all 0.15s;
     }
-    .btn-adm-view {
-      background: var(--c3);
+    .btn-adm:hover { background: var(--c3); border-color: var(--accent-border); }
+    .btn-adm-info { color: #90a0ff; }
+    .btn-adm-del { color: var(--red); }
+    .btn-adm-del:hover { background: var(--red-dim); border-color: rgba(240,96,96,0.4); }
+
+    /* Drop-Folder Explorer inside Admin */
+    .drop-folder-card {
+      background: var(--c1);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+    .drop-folder-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+    .drop-folder-files-box {
+      background: var(--c2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px 12px;
+      margin-top: 8px;
+    }
+    .drop-folder-file-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 4px 0;
+      font-size: 11.5px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .drop-folder-file-item:last-child { border-bottom: none; }
+
+    /* System metrics cards */
+    .sys-metric-box {
+      background: var(--c1);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      margin-bottom: 12px;
+    }
+    .sys-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 12px;
+    }
+    .sys-row:last-child { border-bottom: none; }
+    .sys-label { color: var(--t2); }
+    .sys-val { color: var(--t1); font-weight: 600; font-family: var(--mono); }
+
+    /* Modal Drawer for File Detail */
+    .detail-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .detail-modal {
+      background: var(--c1);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.6);
+      padding: 20px;
+    }
+    .detail-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .detail-modal-title { font-size: 15px; font-weight: 700; color: var(--t1); }
+    .detail-close {
+      background: transparent;
+      border: none;
+      color: var(--t3);
+      cursor: pointer;
+      padding: 4px;
+    }
+    .detail-close:hover { color: var(--t1); }
+
+    .detail-section {
+      margin-bottom: 14px;
+    }
+    .detail-section-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--t3);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+    .detail-field {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      padding: 4px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .detail-field-k { color: var(--t2); }
+    .detail-field-v { color: var(--t1); font-weight: 600; font-family: var(--mono); }
+
+    .detail-btn-row {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+    .detail-btn {
+      padding: 6px 11px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 600;
+      border: 1px solid var(--border);
+      background: var(--c2);
       color: var(--t1);
-      border-color: var(--border);
+      cursor: pointer;
+      transition: all 0.15s;
     }
-    .btn-adm-view:hover {
-      background: var(--c4);
+    .detail-btn:hover { background: var(--c3); border-color: var(--accent-border); }
+    .detail-btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .detail-btn-primary:hover { opacity: 0.9; }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--c3);
+      border: 1px solid var(--border-light);
+      color: var(--t1);
+      padding: 9px 18px;
+      border-radius: 20px;
+      font-size: 12.5px;
+      font-weight: 500;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+      pointer-events: none;
+      opacity: 0;
+      transition: all 0.2s cubic-bezier(0.2, 0.9, 0.3, 1);
+      z-index: 9999;
+      white-space: nowrap;
     }
-    .btn-adm-del {
-      background: rgba(240,96,96,0.12);
-      color: var(--red);
-      border-color: rgba(240,96,96,0.3);
-    }
-    .btn-adm-del:hover {
-      background: rgba(240,96,96,0.25);
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
     }
     .empty-state {
       padding: 36px 16px;
       text-align: center;
       color: var(--t3);
-      font-size: 13px;
-    }
-    .unauth-card {
-      max-width: 420px;
-      margin: 80px auto;
-      text-align: center;
-      padding: 30px 20px;
-      background: var(--c1);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
+      font-size: 12.5px;
     }
   </style>
 </head>
@@ -243,41 +452,47 @@
   <div class="header-inner">
     <div class="logo">
       <div class="logo-mark">
-        <svg viewBox="0 0 16 16" fill="none"><path d="M3 8h10M8 3l5 5-5 5" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <svg viewBox="0 0 16 16" fill="none"><path d="M3 8h10M8 3l5 5-5 5" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg>
       </div>
       <a href="/" class="logo-name">Fast<span>Web</span>File</a>
       <span class="logo-tag">ADM</span>
     </div>
     <div class="main-mode-nav-wrap">
-      <span class="admin-badge">
-        <svg viewBox="0 0 14 14" fill="none" style="width:12px;height:12px"><path d="M7 1l2 3.5 4 .5-3 3 1 4-4-2-4 2 1-4-3-3 4-.5L7 1z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
-        Модерация
-      </span>
+      <nav class="main-mode-nav">
+        <a href="/" class="mode-nav-btn"><span>Главная</span></a>
+        <a href="/admin.html" class="mode-nav-btn active"><span>🛡 Админка</span></a>
+      </nav>
     </div>
     <div class="header-status">
-      <a href="/" class="bl-back">
-        <svg viewBox="0 0 12 12" fill="none"><path d="M8 1L3 6l5 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        На сайт
-      </a>
+      <span class="status-live-dot"></span>
+      <span style="font-size:11px;font-weight:600;color:var(--t2);">Admin</span>
     </div>
   </div>
 </header>
 
 <div class="admin-wrap" id="mainAdminView" hidden>
 
+  <!-- Top bar -->
   <div class="admin-header-row">
     <div>
-      <h1 style="font-size:18px;font-weight:700;color:var(--t1);margin-bottom:2px;">Управление файлами</h1>
-      <p style="font-size:12px;color:var(--t3);">Администратор ID: <span id="adminIdDisplay" style="color:var(--accent);font-family:var(--mono);">7936378054</span></p>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;">
+        <h1 style="font-size:18px;font-weight:800;color:var(--t1);letter-spacing:-0.4px;">Панель Управления</h1>
+        <span class="admin-badge">👑 Владелец ID 7936378054</span>
+      </div>
+      <p style="font-size:11.5px;color:var(--t3);">Модерация файлов, управление хранилищем, мониторинг P2P и сервера</p>
     </div>
-    <div style="display:flex;gap:6px;">
-      <button type="button" class="btn-adm btn-adm-view" id="btnRefresh">
-        <svg viewBox="0 0 14 14" fill="none" style="width:12px;height:12px"><path d="M12.5 7A5.5 5.5 0 112 7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M13 3v4.5H8.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        Обновить
+    <div class="admin-quick-actions">
+      <button class="btn-header-action" id="btnRefresh" title="Обновить данные">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M2.5 8a5.5 5.5 0 019.5-3.8M13.5 8a5.5 5.5 0 01-9.5 3.8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M12 2v2.5h-2.5M4 14v-2.5h2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <span>Обновить</span>
       </button>
-      <button type="button" class="btn-adm btn-adm-del" id="btnCleanExpired">
-        <svg viewBox="0 0 14 14" fill="none" style="width:12px;height:12px"><path d="M2 3.5h10M5 3.5V2a1 1 0 011-1h2a1 1 0 011 1v1.5M11.5 3.5v8a1.5 1.5 0 01-1.5 1.5h-6A1.5 1.5 0 012.5 11.5v-8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
-        Очистить истекшие
+      <button class="btn-header-action" id="btnCleanExpired" title="Очистить все истекшие">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M3 4h10M6 4V2.5a1 1 0 011-1h2a1 1 0 011 1V4M12.5 4v9.5a1.5 1.5 0 01-1.5 1.5H5a1.5 1.5 0 01-1.5-1.5V4" stroke="currentColor" stroke-width="1.3"/></svg>
+        <span>Очистить истекшие</span>
+      </button>
+      <button class="btn-header-action" id="btnBackupDb" title="Скачать бэкап базы">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M8 2v8M4 7l4 4 4-4M3 13h10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        <span>Бэкап</span>
       </button>
     </div>
   </div>
@@ -285,11 +500,7 @@
   <!-- Stats Grid -->
   <div class="admin-stats-grid">
     <div class="stat-card">
-      <div class="stat-card-label">Всего записей</div>
-      <div class="stat-card-value" id="statEntries">0</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-card-label">Занято на диске</div>
+      <div class="stat-card-label">Объем Uploads</div>
       <div class="stat-card-value" id="statSize">0 МБ</div>
     </div>
     <div class="stat-card">
@@ -300,66 +511,204 @@
       <div class="stat-card-label">Drop-папок</div>
       <div class="stat-card-value" id="statDrops">0</div>
     </div>
-  </div>
-
-  <!-- Toolbar -->
-  <div class="admin-toolbar">
-    <input type="text" class="admin-search-input" id="searchInput" placeholder="Поиск по имени, PIN или ID..." />
-    <select class="admin-select" id="filterSelect">
-      <option value="all">Все файлы</option>
-      <option value="file">Обычные файлы</option>
-      <option value="bundle">Бандлы</option>
-      <option value="drop">Drop-папки</option>
-      <option value="expired">Истекшие</option>
-    </select>
-  </div>
-
-  <!-- Files List Card -->
-  <div class="admin-table-card">
-    <div class="admin-files-list" id="filesListContainer">
-      <div class="empty-state">Загрузка файлов...</div>
+    <div class="stat-card">
+      <div class="stat-card-label">RAM (RSS)</div>
+      <div class="stat-card-value" id="statRam">0 MB</div>
     </div>
   </div>
 
+  <!-- iOS Draggable Main Tabs -->
+  <div class="admin-nav-tabs-wrap">
+    <div class="ios-segmented admin-nav-tabs" id="adminMainTabs">
+      <button type="button" class="ios-segment-btn active" data-val="files">📁 Файлы (<span id="tabCountFiles">0</span>)</button>
+      <button type="button" class="ios-segment-btn" data-val="drops">📥 Drop-папки (<span id="tabCountDrops">0</span>)</button>
+      <button type="button" class="ios-segment-btn" data-val="p2p">⚡ P2P Комнаты (<span id="tabCountP2p">0</span>)</button>
+      <button type="button" class="ios-segment-btn" data-val="system">🖥 Система & URL</button>
+      <button type="button" class="ios-segment-btn" data-val="logs">📜 Журнал действий</button>
+    </div>
+  </div>
+
+  <!-- ── VIEW 1: FILES & BUNDLES ─────────────────────────────────────── -->
+  <section class="admin-view-section active" id="viewFiles">
+    <!-- Filter bar -->
+    <div class="admin-toolbar">
+      <input type="text" class="admin-search-input" id="searchInput" placeholder="Поиск по имени, PIN или ID..." />
+      <div class="ios-segmented" id="filesFilterSegment" style="min-width:260px;">
+        <button type="button" class="ios-segment-btn active" data-val="all">Все</button>
+        <button type="button" class="ios-segment-btn" data-val="file">Файлы</button>
+        <button type="button" class="ios-segment-btn" data-val="bundle">Бандлы</button>
+        <button type="button" class="ios-segment-btn" data-val="expired">Истекшие</button>
+      </div>
+    </div>
+
+    <!-- Bulk actions bar (hidden until items selected) -->
+    <div class="bulk-bar" id="bulkBar" style="display:none;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <input type="checkbox" id="checkSelectAll" class="admin-checkbox" />
+        <span style="font-weight:600;color:var(--t1);" id="bulkSelectedText">Выбрано: 0</span>
+      </div>
+      <div class="bulk-bar-actions">
+        <button type="button" class="btn-adm" id="btnBulkExtend" style="color:var(--green);">+3 дня</button>
+        <button type="button" class="btn-adm btn-adm-del" id="btnBulkDelete">Удалить выбранные</button>
+      </div>
+    </div>
+
+    <!-- Files Table -->
+    <div class="admin-table-card">
+      <div class="admin-files-list" id="filesListContainer">
+        <div class="empty-state">Загрузка файлов...</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── VIEW 2: DROP FOLDERS ────────────────────────────────────────── -->
+  <section class="admin-view-section" id="viewDrops">
+    <div id="dropFoldersContainer">
+      <div class="empty-state">Drop-папки не созданы</div>
+    </div>
+  </section>
+
+  <!-- ── VIEW 3: P2P ROOMS ───────────────────────────────────────────── -->
+  <section class="admin-view-section" id="viewP2p">
+    <div class="admin-table-card" style="padding:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <div>
+          <h3 style="font-size:13.5px;font-weight:700;color:var(--t1);">Активные P2P WebRTC Комнаты</h3>
+          <p style="font-size:11px;color:var(--t3);">Прямые соединения браузер-браузер (данные передаются напрямую)</p>
+        </div>
+        <button class="btn-adm" id="btnRefreshP2p">Обновить</button>
+      </div>
+      <div id="p2pListContainer">
+        <div class="empty-state">Активных комнат нет</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── VIEW 4: SYSTEM METRICS & URL ────────────────────────────────── -->
+  <section class="admin-view-section" id="viewSystem">
+    <div class="sys-metric-box">
+      <h3 style="font-size:13px;font-weight:700;color:var(--t1);margin-bottom:10px;">🌐 Telegram WebApp URL & Домен</h3>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+        <input type="text" id="sysAppUrlInput" class="admin-search-input" style="flex:1;" placeholder="https://ваш-проект.onrender.com" />
+        <button class="btn-adm" id="btnSaveAppUrl" style="background:var(--accent);color:#fff;border-color:var(--accent);">Сохранить URL</button>
+      </div>
+      <p style="font-size:11px;color:var(--t3);margin-top:6px;">Этот URL привязан к кнопке вызова WebApp в @fastwebfilebot.</p>
+    </div>
+
+    <div class="sys-metric-box">
+      <h3 style="font-size:13px;font-weight:700;color:var(--t1);margin-bottom:10px;">📊 Ресурсы Сервера</h3>
+      <div class="sys-row"><span class="sys-label">RAM RSS</span><span class="sys-val" id="sysRss">-</span></div>
+      <div class="sys-row"><span class="sys-label">Heap (Used / Total)</span><span class="sys-val" id="sysHeap">-</span></div>
+      <div class="sys-row"><span class="sys-label">Uptime процесса</span><span class="sys-val" id="sysUptime">-</span></div>
+      <div class="sys-row"><span class="sys-label">Node.js</span><span class="sys-val" id="sysNode">-</span></div>
+      <div class="sys-row"><span class="sys-label">Платформа / Архитектура</span><span class="sys-val" id="sysPlatform">-</span></div>
+      <div class="sys-row">
+        <span class="sys-label">Временные чанки (chunks)</span>
+        <span class="sys-val" id="sysChunks">-</span>
+      </div>
+      <div style="margin-top:10px;">
+        <button class="btn-adm" id="btnCleanChunks">🧹 Очистить временные чанки</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── VIEW 5: AUDIT LOGS ─────────────────────────────────────────── -->
+  <section class="admin-view-section" id="viewLogs">
+    <div class="admin-table-card" style="padding:14px;">
+      <h3 style="font-size:13px;font-weight:700;color:var(--t1);margin-bottom:10px;">📜 Журнал административных действий</h3>
+      <div id="logsContainer">
+        <div class="empty-state">Действий пока не зафиксировано</div>
+      </div>
+    </div>
+  </section>
+
 </div>
 
-<!-- Unauthenticated Fallback Card -->
-<div class="unauth-card" id="unauthCard" hidden>
-  <div style="font-size:36px;margin-bottom:12px;">🔒</div>
-  <h2 style="font-size:16px;font-weight:700;color:var(--t1);margin-bottom:6px;">Доступ ограничен</h2>
-  <p style="font-size:12px;color:var(--t3);line-height:1.45;margin-bottom:16px;">
-    Эта панель доступна только администратору сервиса FastWebFile. Откройте ее через команду <code>/adm</code> в боте <b>@fastwebfilebot</b>.
+<!-- ── Unauth Card ── -->
+<div class="wrap" id="unauthCard" hidden style="margin-top:40px;text-align:center;">
+  <div style="width:48px;height:48px;border-radius:12px;background:rgba(240,96,96,0.15);color:var(--red);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;">
+    <svg viewBox="0 0 20 20" fill="none" style="width:24px;height:24px"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.8"/><path d="M10 6v5M10 14.5v.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+  </div>
+  <h2 style="font-size:18px;margin-bottom:8px;">Доступ ограничен</h2>
+  <p style="font-size:13px;color:var(--t3);max-width:380px;margin:0 auto 18px;line-height:1.45;">
+    Эта панель доступна исключительно владельцу сервиса. Откройте ее через команду <code>/adm</code> в боте <b>@fastwebfilebot</b>.
   </p>
   <a href="https://t.me/fastwebfilebot" class="btn-upload" style="text-decoration:none;display:inline-flex;">
     Перейти к боту @fastwebfilebot
   </a>
 </div>
 
+<!-- ── File Detail Drawer / Modal ── -->
+<div class="detail-overlay" id="fileDetailModal" style="display:none;">
+  <div class="detail-modal">
+    <div class="detail-modal-header">
+      <div class="detail-modal-title" id="mdlTitle">Свойства файла</div>
+      <button class="detail-close" id="btnCloseDetail">✕</button>
+    </div>
+
+    <div class="detail-section">
+      <div class="detail-section-title">Информация</div>
+      <div class="detail-field"><span class="detail-field-k">ID</span><span class="detail-field-v" id="mdlId">-</span></div>
+      <div class="detail-field"><span class="detail-field-k">PIN-код</span><span class="detail-field-v" id="mdlPin" style="cursor:pointer;color:#90a0ff;" title="Кликните для копирования">-</span></div>
+      <div class="detail-field"><span class="detail-field-k">Тип</span><span class="detail-field-v" id="mdlType">-</span></div>
+      <div class="detail-field"><span class="detail-field-k">Размер</span><span class="detail-field-v" id="mdlSize">-</span></div>
+      <div class="detail-field"><span class="detail-field-k">Создан</span><span class="detail-field-v" id="mdlCreated">-</span></div>
+      <div class="detail-field"><span class="detail-field-k">Срок хранения</span><span class="detail-field-v" id="mdlExpiry">-</span></div>
+      <div class="detail-field"><span class="detail-field-k">Скачиваний</span><span class="detail-field-v" id="mdlDownloads">-</span></div>
+      <div class="detail-field"><span class="detail-field-k">Пароль</span><span class="detail-field-v" id="mdlPwd">-</span></div>
+      <div class="detail-field"><span class="detail-field-k">EXIF Очищен</span><span class="detail-field-v" id="mdlExif">-</span></div>
+    </div>
+
+    <div class="detail-section">
+      <div class="detail-section-title">Быстрые ссылки</div>
+      <div class="detail-btn-row">
+        <button class="detail-btn" id="btnCopyPageLink">📋 Скопировать ссылку</button>
+        <button class="detail-btn" id="btnCopyPin">🔑 Скопировать PIN</button>
+        <a id="btnOpenPageLink" href="#" target="_blank" class="detail-btn detail-btn-primary">🌐 Открыть страницу</a>
+      </div>
+    </div>
+
+    <div class="detail-section">
+      <div class="detail-section-title">Действия администратора</div>
+      <div class="detail-btn-row">
+        <button class="detail-btn" id="btnExt1d">+1 день</button>
+        <button class="detail-btn" id="btnExt3d">+3 дня</button>
+        <button class="detail-btn" id="btnExt7d">+7 дней</button>
+        <button class="detail-btn" id="btnExtNever">Бессрочно</button>
+        <button class="detail-btn" id="btnExpireNow" style="color:var(--amber);">Завершить сейчас</button>
+        <button class="detail-btn" id="btnResetDl">Сбросить счетчик скачиваний</button>
+        <button class="detail-btn" id="btnRemovePwd" style="display:none;color:var(--amber);">Снять пароль</button>
+        <button class="detail-btn" id="btnModalDelete" style="color:var(--red);">🗑 Удалить с сервера</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
-// Telegram WebApp Setup
 const tg = window.Telegram?.WebApp;
-if (tg) {
-  tg.ready();
-  tg.expand();
-}
-
 const params = new URLSearchParams(window.location.search);
 const adminToken = params.get('token') || localStorage.getItem('fwf_admin_token') || '';
 const initData = tg?.initData || '';
 
 let allItems = [];
+let selectedIds = new Set();
+let currentModalItem = null;
+let currentTab = 'files';
+
+function getHeaders() {
+  const h = { 'Content-Type': 'application/json' };
+  if (adminToken) h['x-admin-token'] = adminToken;
+  if (initData) h['x-telegram-init-data'] = initData;
+  return h;
+}
 
 async function initAdmin() {
   if (adminToken) localStorage.setItem('fwf_admin_token', adminToken);
 
   try {
-    const headers = {};
-    if (adminToken) headers['x-admin-token'] = adminToken;
-    if (initData) headers['x-telegram-init-data'] = initData;
-
-    const res = await fetch('/api/admin/files', { headers });
+    const res = await fetch('/api/admin/files', { headers: getHeaders() });
     if (!res.ok) {
       showUnauth();
       return;
@@ -368,7 +717,12 @@ async function initAdmin() {
     allItems = data.files || [];
     renderStats(data.stats);
     renderList();
+    renderDropFolders();
     document.getElementById('mainAdminView').hidden = false;
+
+    // Load system metrics in background
+    loadSystemMetrics();
+    loadLogs();
   } catch (err) {
     showUnauth();
   }
@@ -381,19 +735,25 @@ function showUnauth() {
 
 function renderStats(s) {
   if (!s) return;
-  document.getElementById('statEntries').textContent = s.totalEntries || 0;
   document.getElementById('statSize').textContent = (s.totalSizeMb || 0) + ' МБ';
   document.getElementById('statFiles').textContent = s.totalFiles || 0;
   document.getElementById('statDrops').textContent = s.dropCount || 0;
+
+  document.getElementById('tabCountFiles').textContent = allItems.filter(i => i.type !== 'drop').length;
+  document.getElementById('tabCountDrops').textContent = allItems.filter(i => i.type === 'drop').length;
 }
 
+// ── Render Files List ──────────────────────────────────────────────
 function renderList() {
   const container = document.getElementById('filesListContainer');
   const q = document.getElementById('searchInput').value.toLowerCase().trim();
-  const filter = document.getElementById('filterSelect').value;
+  const filterBtn = document.querySelector('#filesFilterSegment .ios-segment-btn.active');
+  const filter = filterBtn ? filterBtn.getAttribute('data-val') : 'all';
 
   const now = Date.now();
   let list = allItems.filter(item => {
+    if (item.type === 'drop') return false; // shown in Drops tab
+
     if (filter === 'expired') {
       if (!item.expiresAt || item.expiresAt > now) return false;
     } else if (filter !== 'all') {
@@ -417,9 +777,10 @@ function renderList() {
     const sizeStr = item.size ? formatBytes(item.size) : (item.files ? `${item.files.length} ф.` : '');
     const title = item.title || item.originalName || item.id;
     const pin = item.pin || item.id.toUpperCase();
-    const link = item.type === 'bundle' ? `/b/${item.id}` : (item.type === 'drop' ? `/drop/${item.id}` : `/f/${item.id}`);
+    const link = item.type === 'bundle' ? `/b/${item.id}` : `/f/${item.id}`;
+    const isChecked = selectedIds.has(item.id);
 
-    let typeTag = item.type === 'bundle' ? 'БАНДЛ' : (item.type === 'drop' ? 'DROP' : 'ФАЙЛ');
+    let typeTag = item.type === 'bundle' ? 'БАНДЛ' : 'ФАЙЛ';
     let expiryStr = '';
     if (isExpired) {
       expiryStr = '<span style="color:var(--red);">Истек</span>';
@@ -428,19 +789,22 @@ function renderList() {
     } else if (item.expiresAt) {
       const leftH = Math.max(0, Math.round((item.expiresAt - now) / 3600000));
       expiryStr = `<span>Осталось ~${leftH} ч.</span>`;
+    } else {
+      expiryStr = `<span style="color:var(--green);">Бессрочно</span>`;
     }
 
     return `
-      <div class="admin-file-row">
+      <div class="admin-file-row ${isChecked ? 'selected' : ''}" data-id="${item.id}">
         <div class="admin-file-left">
+          <input type="checkbox" class="admin-checkbox row-check" data-id="${item.id}" ${isChecked ? 'checked' : ''} />
           <div class="admin-file-icon">
             <svg viewBox="0 0 16 16" fill="none"><path d="M3 2a1 1 0 011-1h5.5l3.5 3.5V14a1 1 0 01-1 1H4a1 1 0 01-1-1V2z" stroke="currentColor" stroke-width="1.3"/><path d="M9 1v4h4" stroke="currentColor" stroke-width="1.3"/></svg>
           </div>
-          <div class="admin-file-info">
+          <div class="admin-file-info" onclick="openFileDetail('${item.id}')">
             <div class="admin-file-title" title="${escapeHtml(title)}">${escapeHtml(title)}</div>
             <div class="admin-file-meta">
               <span class="admin-type-badge">${typeTag}</span>
-              <span class="admin-pin-badge" onclick="copyText('${pin}')" title="Кликните, чтобы скопировать PIN">PIN: ${pin}</span>
+              <span class="admin-pin-badge" onclick="event.stopPropagation(); copyText('${pin}')" title="Скопировать PIN">PIN: ${pin}</span>
               <span>${sizeStr}</span>
               <span>·</span>
               ${expiryStr}
@@ -450,70 +814,437 @@ function renderList() {
           </div>
         </div>
         <div class="admin-actions">
-          <a href="${link}" target="_blank" class="btn-adm btn-adm-view" title="Открыть страницу файла">
-            <svg viewBox="0 0 14 14" fill="none" style="width:11px;height:11px"><path d="M1 7s2.5-4 6-4 6 4 6 4-2.5 4-6 4-6-4-6-4z" stroke="currentColor" stroke-width="1.3"/><circle cx="7" cy="7" r="1.5" stroke="currentColor" stroke-width="1.3"/></svg>
-            Открыть
-          </a>
-          <button type="button" class="btn-adm btn-adm-del" onclick="deleteFile('${item.id}', '${escapeHtml(title)}')" title="Удалить с диска и базы">
-            <svg viewBox="0 0 14 14" fill="none" style="width:11px;height:11px"><path d="M2 3.5h10M5 3.5V2a1 1 0 011-1h2a1 1 0 011 1v1.5M11.5 3.5v8a1.5 1.5 0 01-1.5 1.5h-6A1.5 1.5 0 012.5 11.5v-8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
-            Удалить
+          <button type="button" class="btn-adm btn-adm-info" onclick="openFileDetail('${item.id}')" title="Свойства и управление">
+            Инфо
           </button>
+          <a href="${link}" target="_blank" class="btn-adm" title="Открыть страницу скачивания">
+            🌐 Открыть
+          </a>
+          <button type="button" class="btn-adm btn-adm-del" onclick="deleteFile('${item.id}', '${escapeHtml(title)}')" title="Удалить файл">
+            🗑
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  updateBulkBar();
+}
+
+// ── Drop Folders Explorer ──────────────────────────────────────────
+function renderDropFolders() {
+  const container = document.getElementById('dropFoldersContainer');
+  const drops = allItems.filter(i => i.type === 'drop');
+
+  if (drops.length === 0) {
+    container.innerHTML = '<div class="empty-state">Активных Drop-папок нет</div>';
+    return;
+  }
+
+  const now = Date.now();
+  container.innerHTML = drops.map(drop => {
+    const isExpired = drop.expiresAt && drop.expiresAt <= now;
+    const files = drop.files || [];
+    const filesCount = files.length;
+    const pin = drop.pin || drop.id.toUpperCase();
+    const link = `/drop/${drop.id}`;
+
+    let filesHtml = files.map((f, idx) => `
+      <div class="drop-folder-file-item">
+        <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--t1);">
+          📄 ${escapeHtml(f.originalName || f.filename)}
+        </span>
+        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+          <span style="color:var(--t3);">${formatBytes(f.size || 0)}</span>
+          <a href="/api/download/${f.filename}" download="${escapeHtml(f.originalName || '')}" class="btn-adm" style="padding:2px 6px;">Скачать</a>
+        </div>
+      </div>
+    `).join('');
+
+    if (!filesHtml) filesHtml = '<div style="color:var(--t3);font-size:11px;padding:4px 0;">Файлы еще не загружены</div>';
+
+    return `
+      <div class="drop-folder-card">
+        <div class="drop-folder-header">
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-size:13.5px;font-weight:700;color:var(--t1);">${escapeHtml(drop.title || 'Drop-папка')}</span>
+              <span class="admin-pin-badge" onclick="copyText('${pin}')">PIN: ${pin}</span>
+              ${isExpired ? '<span style="color:var(--red);font-size:11px;font-weight:600;">Истекла</span>' : '<span style="color:var(--green);font-size:11px;">Активна</span>'}
+            </div>
+            <div style="font-size:11px;color:var(--t3);margin-top:2px;">
+              Собрано файлов: <b>${filesCount}</b> · Ссылка: <code>${link}</code>
+            </div>
+          </div>
+          <div style="display:flex;gap:6px;">
+            <a href="${link}" target="_blank" class="btn-adm">🌐 Открыть папку</a>
+            <button class="btn-adm btn-adm-del" onclick="deleteFile('${drop.id}', '${escapeHtml(drop.title)}')">Удалить папку</button>
+          </div>
+        </div>
+        <div class="drop-folder-files-box">
+          <div style="font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;margin-bottom:4px;">Файлы в этой папке:</div>
+          ${filesHtml}
         </div>
       </div>
     `;
   }).join('');
 }
 
-async function deleteFile(id, name) {
-  if (!confirm(`Удалить файл "${name}" с сервера навсегда?`)) return;
+// ── Bulk Selection ─────────────────────────────────────────────────
+document.addEventListener('change', e => {
+  if (e.target.classList.contains('row-check')) {
+    const id = e.target.dataset.id;
+    if (e.target.checked) selectedIds.add(id);
+    else selectedIds.delete(id);
+    renderList();
+  }
+});
 
-  const headers = {};
-  if (adminToken) headers['x-admin-token'] = adminToken;
-  if (initData) headers['x-telegram-init-data'] = initData;
+document.getElementById('checkSelectAll').addEventListener('change', e => {
+  const visibleRows = document.querySelectorAll('.row-check');
+  visibleRows.forEach(c => {
+    if (e.target.checked) selectedIds.add(c.dataset.id);
+    else selectedIds.delete(c.dataset.id);
+  });
+  renderList();
+});
+
+function updateBulkBar() {
+  const bar = document.getElementById('bulkBar');
+  const count = selectedIds.size;
+  if (count > 0) {
+    bar.style.display = 'flex';
+    document.getElementById('bulkSelectedText').textContent = `Выбрано: ${count}`;
+  } else {
+    bar.style.display = 'none';
+  }
+}
+
+document.getElementById('btnBulkDelete').addEventListener('click', async () => {
+  if (!selectedIds.size) return;
+  if (!confirm(`Удалить выбранные ${selectedIds.size} файлов с сервера?`)) return;
 
   try {
-    const res = await fetch(`/api/admin/files/${encodeURIComponent(id)}`, {
-      method: 'DELETE',
-      headers
+    const res = await fetch('/api/admin/files/bulk-delete', {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify({ ids: Array.from(selectedIds) })
+    });
+    const d = await res.json();
+    showToast(`Удалено файлов: ${d.deletedCount || 0}`);
+    selectedIds.clear();
+    initAdmin();
+  } catch {
+    showToast('Ошибка массового удаления');
+  }
+});
+
+document.getElementById('btnBulkExtend').addEventListener('click', async () => {
+  if (!selectedIds.size) return;
+  for (const id of selectedIds) {
+    await fetch(`/api/admin/files/${encodeURIComponent(id)}/extend`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify({ hours: 72 })
+    });
+  }
+  showToast('Срок продлен на 3 дня для всех выбранных');
+  selectedIds.clear();
+  initAdmin();
+});
+
+// ── File Detail Drawer Modal ───────────────────────────────────────
+function openFileDetail(id) {
+  const item = allItems.find(i => i.id === id);
+  if (!item) return;
+  currentModalItem = item;
+
+  document.getElementById('mdlTitle').textContent = item.title || item.originalName || item.id;
+  document.getElementById('mdlId').textContent = item.id;
+  document.getElementById('mdlPin').textContent = item.pin || item.id.toUpperCase();
+  document.getElementById('mdlType').textContent = (item.type || 'file').toUpperCase();
+  document.getElementById('mdlSize').textContent = item.size ? formatBytes(item.size) : (item.files ? `${item.files.length} файлов` : '-');
+  document.getElementById('mdlCreated').textContent = item.createdAt ? new Date(item.createdAt).toLocaleString('ru') : '-';
+
+  if (!item.expiresAt) {
+    document.getElementById('mdlExpiry').textContent = 'Бессрочно';
+  } else if (item.expiresAt <= Date.now()) {
+    document.getElementById('mdlExpiry').innerHTML = '<span style="color:var(--red);">Истек</span>';
+  } else {
+    document.getElementById('mdlExpiry').textContent = new Date(item.expiresAt).toLocaleString('ru');
+  }
+
+  document.getElementById('mdlDownloads').textContent = `${item.downloads || 0} / ${item.maxDownloads ? item.maxDownloads : '∞'}`;
+  document.getElementById('mdlPwd').innerHTML = item.hasPassword ? '<span style="color:var(--amber);">Установлен</span>' : 'Нет';
+  document.getElementById('mdlExif').innerHTML = item.shredded ? '<span style="color:var(--green);">Очищен</span>' : 'Без изменений';
+
+  const link = (item.type === 'bundle') ? `/b/${item.id}` : `/f/${item.id}`;
+  document.getElementById('btnOpenPageLink').href = link;
+  document.getElementById('btnRemovePwd').style.display = item.hasPassword ? 'inline-flex' : 'none';
+
+  document.getElementById('fileDetailModal').style.display = 'flex';
+}
+
+document.getElementById('btnCloseDetail').addEventListener('click', () => {
+  document.getElementById('fileDetailModal').style.display = 'none';
+  currentModalItem = null;
+});
+document.getElementById('fileDetailModal').addEventListener('click', e => {
+  if (e.target === document.getElementById('fileDetailModal')) {
+    document.getElementById('fileDetailModal').style.display = 'none';
+  }
+});
+
+// Modal Actions
+document.getElementById('btnCopyPageLink').addEventListener('click', () => {
+  if (!currentModalItem) return;
+  const link = window.location.origin + ((currentModalItem.type === 'bundle') ? `/b/${currentModalItem.id}` : `/f/${currentModalItem.id}`);
+  copyText(link);
+});
+document.getElementById('btnCopyPin').addEventListener('click', () => {
+  if (!currentModalItem) return;
+  copyText(currentModalItem.pin || currentModalItem.id.toUpperCase());
+});
+document.getElementById('mdlPin').addEventListener('click', () => {
+  if (!currentModalItem) return;
+  copyText(currentModalItem.pin || currentModalItem.id.toUpperCase());
+});
+
+async function extendModalItem(hours) {
+  if (!currentModalItem) return;
+  try {
+    const res = await fetch(`/api/admin/files/${encodeURIComponent(currentModalItem.id)}/extend`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify({ hours })
     });
     const d = await res.json();
     if (d.ok) {
-      showToast('Файл успешно удален с сервера');
+      showToast(hours === -1 ? 'Установлен бессрочный срок' : `Срок продлен на +${hours} ч.`);
+      initAdmin();
+      document.getElementById('fileDetailModal').style.display = 'none';
+    }
+  } catch {
+    showToast('Ошибка продления');
+  }
+}
+
+document.getElementById('btnExt1d').addEventListener('click', () => extendModalItem(24));
+document.getElementById('btnExt3d').addEventListener('click', () => extendModalItem(72));
+document.getElementById('btnExt7d').addEventListener('click', () => extendModalItem(168));
+document.getElementById('btnExtNever').addEventListener('click', () => extendModalItem(-1));
+
+document.getElementById('btnExpireNow').addEventListener('click', async () => {
+  if (!currentModalItem) return;
+  if (!confirm('Истечь срок действия этого файла прямо сейчас?')) return;
+  await fetch(`/api/admin/files/${encodeURIComponent(currentModalItem.id)}/expire`, { method: 'POST', headers: getHeaders() });
+  showToast('Срок действия завершен');
+  initAdmin();
+  document.getElementById('fileDetailModal').style.display = 'none';
+});
+
+document.getElementById('btnResetDl').addEventListener('click', async () => {
+  if (!currentModalItem) return;
+  await fetch(`/api/admin/files/${encodeURIComponent(currentModalItem.id)}/reset-downloads`, { method: 'POST', headers: getHeaders(), body: JSON.stringify({ maxDownloads: null }) });
+  showToast('Счетчик скачиваний обнулен');
+  initAdmin();
+  document.getElementById('fileDetailModal').style.display = 'none';
+});
+
+document.getElementById('btnRemovePwd').addEventListener('click', async () => {
+  if (!currentModalItem) return;
+  if (!confirm('Снять пароль с этого файла?')) return;
+  await fetch(`/api/admin/files/${encodeURIComponent(currentModalItem.id)}/remove-password`, { method: 'POST', headers: getHeaders() });
+  showToast('Пароль удален');
+  initAdmin();
+  document.getElementById('fileDetailModal').style.display = 'none';
+});
+
+document.getElementById('btnModalDelete').addEventListener('click', () => {
+  if (!currentModalItem) return;
+  deleteFile(currentModalItem.id, currentModalItem.title);
+  document.getElementById('fileDetailModal').style.display = 'none';
+});
+
+// ── Delete File ────────────────────────────────────────────────────
+async function deleteFile(id, name) {
+  if (!confirm(`Удалить "${name || id}" с сервера навсегда?`)) return;
+  try {
+    const res = await fetch(`/api/admin/files/${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+      headers: getHeaders()
+    });
+    const d = await res.json();
+    if (d.ok) {
+      showToast('Удалено с сервера');
       allItems = allItems.filter(f => f.id !== id);
+      selectedIds.delete(id);
       renderList();
+      renderDropFolders();
+      loadLogs();
     } else {
       showToast('Ошибка удаления: ' + (d.error || ''));
     }
-  } catch (e) {
+  } catch {
     showToast('Сетевая ошибка');
   }
 }
 
-async function cleanExpired() {
-  if (!confirm('Очистить все истекшие файлы прямо сейчас?')) return;
-  const headers = {};
-  if (adminToken) headers['x-admin-token'] = adminToken;
-  if (initData) headers['x-telegram-init-data'] = initData;
-
+// ── System & P2P & Logs ────────────────────────────────────────────
+async function loadSystemMetrics() {
   try {
-    const res = await fetch('/api/admin/clean-expired', { method: 'POST', headers });
+    const res = await fetch('/api/admin/system', { headers: getHeaders() });
+    if (!res.ok) return;
     const d = await res.json();
-    showToast(`Очищено файлов: ${d.cleaned || 0}`);
-    initAdmin();
-  } catch (e) {
-    showToast('Ошибка очистки');
-  }
+    if (d.memory) {
+      document.getElementById('statRam').textContent = d.memory.rssMb + ' MB';
+      document.getElementById('sysRss').textContent = d.memory.rssMb + ' MB';
+      document.getElementById('sysHeap').textContent = `${d.memory.heapUsedMb} MB / ${d.memory.heapTotalMb} MB`;
+    }
+    const upH = (d.uptimeSec / 3600).toFixed(1);
+    document.getElementById('sysUptime').textContent = `${upH} ч. (${d.uptimeSec} сек.)`;
+    document.getElementById('sysNode').textContent = d.nodeVersion;
+    document.getElementById('sysPlatform').textContent = `${d.platform} (${d.arch})`;
+
+    if (d.chunks) {
+      document.getElementById('sysChunks').textContent = `${d.chunks.sessions} сессий (${d.chunks.sizeMb} МБ)`;
+    }
+
+    if (d.appUrl) {
+      document.getElementById('sysAppUrlInput').value = d.appUrl;
+    }
+
+    // P2P List
+    const p2pRooms = d.p2pRooms || [];
+    document.getElementById('tabCountP2p').textContent = p2pRooms.length;
+    renderP2pList(p2pRooms);
+  } catch {}
 }
 
+function renderP2pList(rooms) {
+  const container = document.getElementById('p2pListContainer');
+  if (!rooms.length) {
+    container.innerHTML = '<div class="empty-state">Активных P2P сессий нет</div>';
+    return;
+  }
+
+  container.innerHTML = rooms.map(r => `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);">
+      <div>
+        <div style="font-weight:700;color:var(--t1);font-family:var(--mono);">Комната ${r.code}</div>
+        <div style="font-size:11px;color:var(--t3);">Создана ${r.ageMin} мин. назад · Хост: ${r.hasHost ? '🟢 подключен' : '🔴 ожидает'} · Клиент: ${r.hasClient ? '🟢 подключен' : '🔴 ожидает'}</div>
+      </div>
+      <button class="btn-adm btn-adm-del" onclick="closeP2pRoom('${r.code}')">Закрыть</button>
+    </div>
+  `).join('');
+}
+
+async function closeP2pRoom(code) {
+  if (!confirm(`Принудительно закрыть P2P комнату ${code}?`)) return;
+  await fetch(`/api/admin/p2p/${code}`, { method: 'DELETE', headers: getHeaders() });
+  showToast(`Комната ${code} закрыта`);
+  loadSystemMetrics();
+}
+
+async function loadLogs() {
+  try {
+    const res = await fetch('/api/admin/logs', { headers: getHeaders() });
+    if (!res.ok) return;
+    const d = await res.json();
+    const container = document.getElementById('logsContainer');
+    const logs = d.logs || [];
+    if (!logs.length) {
+      container.innerHTML = '<div class="empty-state">Действий пока нет</div>';
+      return;
+    }
+    container.innerHTML = logs.map(l => `
+      <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:11.5px;">
+        <div>
+          <b style="color:var(--t1);">${escapeHtml(l.action)}</b>: <span style="color:var(--t2);">${escapeHtml(l.details)}</span>
+        </div>
+        <div style="color:var(--t3);font-family:var(--mono);">${new Date(l.time).toLocaleTimeString('ru')}</div>
+      </div>
+    `).join('');
+  } catch {}
+}
+
+// Save WebApp URL
+document.getElementById('btnSaveAppUrl').addEventListener('click', async () => {
+  const url = document.getElementById('sysAppUrlInput').value.trim();
+  if (!url.startsWith('https://')) {
+    alert('URL должен начинаться с https://');
+    return;
+  }
+  const res = await fetch('/api/admin/set-url', {
+    method: 'POST',
+    headers: getHeaders(),
+    body: JSON.stringify({ url })
+  });
+  const d = await res.json();
+  if (d.ok) {
+    showToast('WebApp URL успешно сохранен!');
+    loadLogs();
+  }
+});
+
+document.getElementById('btnCleanChunks').addEventListener('click', async () => {
+  const res = await fetch('/api/admin/clean-chunks', { method: 'POST', headers: getHeaders() });
+  const d = await res.json();
+  showToast(`Удалено сессий чанков: ${d.cleaned || 0}`);
+  loadSystemMetrics();
+  loadLogs();
+});
+
+document.getElementById('btnCleanExpired').addEventListener('click', async () => {
+  if (!confirm('Очистить все истекшие файлы прямо сейчас?')) return;
+  const res = await fetch('/api/admin/clean-expired', { method: 'POST', headers: getHeaders() });
+  const d = await res.json();
+  showToast(`Очищено файлов: ${d.cleaned || 0}`);
+  initAdmin();
+});
+
+document.getElementById('btnBackupDb').addEventListener('click', () => {
+  window.location.href = `/api/admin/backup-db?token=${encodeURIComponent(adminToken)}`;
+});
+
+document.getElementById('btnRefresh').addEventListener('click', () => {
+  initAdmin();
+  showToast('Данные обновлены');
+});
+
+document.getElementById('btnRefreshP2p').addEventListener('click', loadSystemMetrics);
+
+// ── Tabs Switching with iOS Segmented Control ──────────────────────
+document.getElementById('adminMainTabs').addEventListener('segmentchange', e => {
+  const val = e.detail.value;
+  switchTab(val);
+});
+
+function switchTab(val) {
+  currentTab = val;
+  document.querySelectorAll('.admin-view-section').forEach(sec => sec.classList.remove('active'));
+  if (val === 'files') document.getElementById('viewFiles').classList.add('active');
+  else if (val === 'drops') document.getElementById('viewDrops').classList.add('active');
+  else if (val === 'p2p') { document.getElementById('viewP2p').classList.add('active'); loadSystemMetrics(); }
+  else if (val === 'system') { document.getElementById('viewSystem').classList.add('active'); loadSystemMetrics(); }
+  else if (val === 'logs') { document.getElementById('viewLogs').classList.add('active'); loadLogs(); }
+}
+
+document.getElementById('filesFilterSegment').addEventListener('segmentchange', () => {
+  renderList();
+});
+
+document.getElementById('searchInput').addEventListener('input', renderList);
+
 function copyText(txt) {
-  navigator.clipboard.writeText(txt).then(() => showToast('PIN скопирован: ' + txt));
+  navigator.clipboard.writeText(txt).then(() => showToast('Скопировано: ' + txt));
 }
 
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2500);
+  setTimeout(() => t.classList.remove('show'), 2400);
 }
 
 function formatBytes(bytes) {
@@ -527,11 +1258,6 @@ function formatBytes(bytes) {
 function escapeHtml(s) {
   return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
-
-document.getElementById('searchInput').addEventListener('input', renderList);
-document.getElementById('filterSelect').addEventListener('change', renderList);
-document.getElementById('btnRefresh').addEventListener('click', initAdmin);
-document.getElementById('btnCleanExpired').addEventListener('click', cleanExpired);
 
 initAdmin();
 </script>

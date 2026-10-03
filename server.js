@@ -7,7 +7,7 @@ const path    = require('path');
 const fs      = require('fs');
 const crypto  = require('crypto');
 const zlib    = require('zlib');
-const { startBot, stopBot, updateAppUrl, validateAdminToken, verifyTelegramWebAppData } = require('./bot');
+const { startBot, stopBot, updateAppUrl, validateAdminToken, verifyTelegramWebAppData, getConfig } = require('./bot');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
@@ -1010,7 +1010,18 @@ function requireAdmin(req, res, next) {
   return res.status(403).json({ ok: false, error: 'Доступ запрещен. Требуются права администратора.' });
 }
 
-// Admin API
+// ── Admin API Endpoints ──────────────────────────────────────────────
+const adminAuditLogs = [];
+function logAdminAction(action, details) {
+  adminAuditLogs.unshift({
+    id: uuidv4().slice(0, 8),
+    time: Date.now(),
+    action,
+    details
+  });
+  if (adminAuditLogs.length > 100) adminAuditLogs.pop();
+}
+
 app.get('/api/admin/files', requireAdmin, (req, res) => {
   const db = loadDB();
   const stats = getDbStats();
@@ -1023,13 +1034,14 @@ app.get('/api/admin/files', requireAdmin, (req, res) => {
       originalName: e.originalName,
       size: e.size,
       pin: e.pin || k.toUpperCase(),
-      createdAt: e.createdAt,
+      createdAt: e.createdAt || e.uploadedAt,
       expiresAt: e.expiresAt,
-      downloads: e.downloads,
+      downloads: e.downloads || 0,
       maxDownloads: e.maxDownloads,
       hasPassword: !!e.passwordHash,
       shredded: !!e.shredded,
-      files: e.files
+      description: e.description,
+      files: e.files || []
     };
   }).reverse();
 
@@ -1042,13 +1054,206 @@ app.delete('/api/admin/files/:id', requireAdmin, (req, res) => {
   const entry = getEntry(db, id);
   if (!entry) return res.status(404).json({ ok: false, error: 'Файл не найден' });
   const realId = Object.keys(db).find(k => db[k] === entry) || id;
+  const title = entry.title || entry.originalName || realId;
   deleteEntry(realId, db);
+  logAdminAction('Удаление файла', `Удален "${title}" (ID: ${realId})`);
   res.json({ ok: true, deleted: realId });
 });
 
+app.post('/api/admin/files/bulk-delete', requireAdmin, (req, res) => {
+  const { ids } = req.body;
+  if (!Array.isArray(ids) || ids.length === 0) {
+    return res.status(400).json({ ok: false, error: 'Не указаны файлы для удаления' });
+  }
+  const db = loadDB();
+  let deletedCount = 0;
+  for (const id of ids) {
+    const entry = getEntry(db, id);
+    if (entry) {
+      const realId = Object.keys(db).find(k => db[k] === entry) || id;
+      deleteEntry(realId, db);
+      deletedCount++;
+    }
+  }
+  logAdminAction('Массовое удаление', `Удалено ${deletedCount} файлов`);
+  res.json({ ok: true, deletedCount });
+});
+
+// Extend file expiry (+hours or -1 for permanent)
+app.post('/api/admin/files/:id/extend', requireAdmin, (req, res) => {
+  const { hours = 24 } = req.body;
+  const db = loadDB();
+  const entry = getEntry(db, req.params.id);
+  if (!entry) return res.status(404).json({ ok: false, error: 'Файл не найден' });
+
+  if (hours === -1) {
+    entry.expiresAt = null;
+    entry.expiry = 'never';
+  } else {
+    const baseTime = (entry.expiresAt && entry.expiresAt > Date.now()) ? entry.expiresAt : Date.now();
+    entry.expiresAt = baseTime + Number(hours) * 3600 * 1000;
+  }
+  saveDB(db);
+  const title = entry.title || entry.originalName || req.params.id;
+  logAdminAction('Продление срока', `Продлен "${title}" (+${hours === -1 ? 'бессрочно' : hours + ' ч.'})`);
+  res.json({ ok: true, expiresAt: entry.expiresAt });
+});
+
+// Force expire / lock file
+app.post('/api/admin/files/:id/expire', requireAdmin, (req, res) => {
+  const db = loadDB();
+  const entry = getEntry(db, req.params.id);
+  if (!entry) return res.status(404).json({ ok: false, error: 'Файл не найден' });
+
+  entry.expiresAt = Date.now() - 1000;
+  saveDB(db);
+  const title = entry.title || entry.originalName || req.params.id;
+  logAdminAction('Принудительное закрытие', `Срок действия "${title}" истек`);
+  res.json({ ok: true, expired: true });
+});
+
+// Reset download counter or change download limit
+app.post('/api/admin/files/:id/reset-downloads', requireAdmin, (req, res) => {
+  const { maxDownloads } = req.body;
+  const db = loadDB();
+  const entry = getEntry(db, req.params.id);
+  if (!entry) return res.status(404).json({ ok: false, error: 'Файл не найден' });
+
+  entry.downloads = 0;
+  if (maxDownloads !== undefined) {
+    entry.maxDownloads = maxDownloads === null || maxDownloads === 0 ? null : Number(maxDownloads);
+  }
+  saveDB(db);
+  const title = entry.title || entry.originalName || req.params.id;
+  logAdminAction('Сброс скачиваний', `Счетчик "${title}" обнулен`);
+  res.json({ ok: true, downloads: entry.downloads, maxDownloads: entry.maxDownloads });
+});
+
+// Remove password protection
+app.post('/api/admin/files/:id/remove-password', requireAdmin, (req, res) => {
+  const db = loadDB();
+  const entry = getEntry(db, req.params.id);
+  if (!entry) return res.status(404).json({ ok: false, error: 'Файл не найден' });
+
+  entry.passwordHash = null;
+  saveDB(db);
+  const title = entry.title || entry.originalName || req.params.id;
+  logAdminAction('Снятие пароля', `Пароль снят с "${title}"`);
+  res.json({ ok: true, hasPassword: false });
+});
+
+// Clean expired files
 app.post('/api/admin/clean-expired', requireAdmin, (req, res) => {
   const cleaned = cleanExpiredFiles();
+  logAdminAction('Очистка истекших', `Очищено ${cleaned} истекших файлов`);
   res.json({ ok: true, cleaned });
+});
+
+// Clean stale chunks
+app.post('/api/admin/clean-chunks', requireAdmin, (req, res) => {
+  let cleaned = 0;
+  if (fs.existsSync(CHUNKS_DIR)) {
+    const sessions = fs.readdirSync(CHUNKS_DIR);
+    for (const s of sessions) {
+      const sp = path.join(CHUNKS_DIR, s);
+      try {
+        fs.rmSync(sp, { recursive: true, force: true });
+        cleaned++;
+      } catch {}
+    }
+  }
+  logAdminAction('Очистка чанков', `Удалено ${cleaned} сессий временных чанков`);
+  res.json({ ok: true, cleaned });
+});
+
+// System & live metrics
+app.get('/api/admin/system', requireAdmin, (req, res) => {
+  const mem = process.memoryUsage();
+  const stats = getDbStats();
+
+  let chunkSessionsCount = 0;
+  let chunkTotalBytes = 0;
+  if (fs.existsSync(CHUNKS_DIR)) {
+    const sessions = fs.readdirSync(CHUNKS_DIR);
+    chunkSessionsCount = sessions.length;
+    for (const s of sessions) {
+      const sp = path.join(CHUNKS_DIR, s);
+      try {
+        const files = fs.readdirSync(sp);
+        for (const f of files) {
+          const stat = fs.statSync(path.join(sp, f));
+          chunkTotalBytes += stat.size;
+        }
+      } catch {}
+    }
+  }
+
+  const p2pList = Array.from(p2pRooms.entries()).map(([code, room]) => ({
+    code,
+    createdAt: room.createdAt,
+    ageMin: Math.round((Date.now() - room.createdAt) / 60000),
+    hasHost: !!room.hostPeer,
+    hasClient: !!room.clientPeer
+  }));
+
+  const cfg = typeof getConfig === 'function' ? getConfig() : {};
+
+  res.json({
+    ok: true,
+    uptimeSec: Math.floor(process.uptime()),
+    nodeVersion: process.version,
+    platform: process.platform,
+    arch: process.arch,
+    memory: {
+      rssMb: (mem.rss / 1024 / 1024).toFixed(1),
+      heapUsedMb: (mem.heapUsed / 1024 / 1024).toFixed(1),
+      heapTotalMb: (mem.heapTotal / 1024 / 1024).toFixed(1)
+    },
+    stats,
+    chunks: {
+      sessions: chunkSessionsCount,
+      sizeMb: (chunkTotalBytes / 1024 / 1024).toFixed(2)
+    },
+    p2pRooms: p2pList,
+    appUrl: cfg.appUrl || ''
+  });
+});
+
+// Close P2P room
+app.delete('/api/admin/p2p/:code', requireAdmin, (req, res) => {
+  const code = req.params.code.toUpperCase();
+  if (p2pRooms.has(code)) {
+    p2pRooms.delete(code);
+    logAdminAction('Закрытие P2P', `Закрыта комната ${code}`);
+    return res.json({ ok: true });
+  }
+  res.status(404).json({ ok: false, error: 'Комната не найдена' });
+});
+
+// Get Audit Logs
+app.get('/api/admin/logs', requireAdmin, (req, res) => {
+  res.json({ ok: true, logs: adminAuditLogs });
+});
+
+// Backup DB
+app.get('/api/admin/backup-db', requireAdmin, (req, res) => {
+  if (fs.existsSync(DB_FILE)) {
+    logAdminAction('Резервная копия', 'Скачан файл files_db.json');
+    res.download(DB_FILE, `fastwebfile_backup_${Date.now()}.json`);
+  } else {
+    res.json({});
+  }
+});
+
+// Update WebApp URL from Admin
+app.post('/api/admin/set-url', requireAdmin, (req, res) => {
+  const { url } = req.body;
+  if (!url || !url.startsWith('https://')) {
+    return res.status(400).json({ ok: false, error: 'URL должен начинаться с https://' });
+  }
+  updateAppUrl(url);
+  logAdminAction('Смена URL', `Установлен новый URL: ${url}`);
+  res.json({ ok: true, url });
 });
 
 // Hourly cleanup
