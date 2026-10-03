@@ -920,6 +920,184 @@ app.post('/api/p2p/signal/:code', (req, res) => {
     res.json({ ok: true, delivered: false, waitingForPeer: true });
   }
 });
+// ── AIR (LOCAL WI-FI / SAME NETWORK AIRDROP DISCOVERY) ────────────────────────
+const airNetworks = new Map(); // networkKey -> Map of peerId -> peerInfo
+const airRelays = new Map();   // relayId -> { fileMeta, buffer, targetPeerId, senderPeerId, createdAt }
+
+function getClientNetworkKey(req, customRoom) {
+  if (customRoom && typeof customRoom === 'string' && customRoom.trim().length > 0) {
+    return 'room_' + customRoom.trim().toLowerCase().slice(0, 32);
+  }
+  const rawIp = req.headers['cf-connecting-ip'] ||
+                (req.headers['x-forwarded-for'] ? req.headers['x-forwarded-for'].split(',')[0].trim() : null) ||
+                req.ip ||
+                req.socket?.remoteAddress ||
+                '127.0.0.1';
+  return 'wifi_' + crypto.createHash('sha256').update(rawIp).digest('hex').slice(0, 16);
+}
+
+app.get('/air', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'air.html'));
+});
+
+// SSE discovery & presence stream for devices on the same Wi-Fi
+app.get('/api/air/stream', (req, res) => {
+  const peerId = String(req.query.peerId || uuidv4().slice(0, 8));
+  const customRoom = req.query.room || '';
+  const networkKey = getClientNetworkKey(req, customRoom);
+  const name = String(req.query.name || 'Устройство').trim().slice(0, 32);
+  const deviceType = String(req.query.deviceType || 'phone').slice(0, 16);
+  const os = String(req.query.os || 'Unknown').slice(0, 16);
+  const icon = String(req.query.icon || '📱').slice(0, 8);
+  const color = String(req.query.color || '#5b6af0').slice(0, 16);
+
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  res.flushHeaders?.();
+
+  if (!airNetworks.has(networkKey)) {
+    airNetworks.set(networkKey, new Map());
+  }
+  const network = airNetworks.get(networkKey);
+
+  const peerData = {
+    peerId,
+    name,
+    deviceType,
+    os,
+    icon,
+    color,
+    networkKey,
+    res,
+    joinedAt: Date.now()
+  };
+
+  network.set(peerId, peerData);
+
+  // Send current peers list to newly connected peer (excluding self)
+  const peerList = [];
+  for (const [id, p] of network.entries()) {
+    if (id !== peerId) {
+      peerList.push({
+        peerId: p.peerId,
+        name: p.name,
+        deviceType: p.deviceType,
+        os: p.os,
+        icon: p.icon,
+        color: p.color
+      });
+    }
+  }
+
+  // 1. Initial event to self
+  res.write(`data: ${JSON.stringify({
+    type: 'connected',
+    myPeerId: peerId,
+    networkKey,
+    isWifi: !customRoom,
+    peers: peerList
+  })}\n\n`);
+
+  // 2. Broadcast peer_joined to all other peers in the same network
+  const joinMsg = JSON.stringify({
+    type: 'peer_joined',
+    peer: {
+      peerId,
+      name,
+      deviceType,
+      os,
+      icon,
+      color
+    }
+  });
+
+  for (const [id, p] of network.entries()) {
+    if (id !== peerId) {
+      try { p.res.write(`data: ${joinMsg}\n\n`); } catch {}
+    }
+  }
+
+  // Keep-alive heartbeat ping every 15s
+  const pingInterval = setInterval(() => {
+    try { res.write(':ping\n\n'); } catch {}
+  }, 15000);
+
+  req.on('close', () => {
+    clearInterval(pingInterval);
+    if (network.get(peerId)?.res === res) {
+      network.delete(peerId);
+      if (network.size === 0) {
+        airNetworks.delete(networkKey);
+      } else {
+        const leaveMsg = JSON.stringify({ type: 'peer_left', peerId });
+        for (const [id, p] of network.entries()) {
+          try { p.res.write(`data: ${leaveMsg}\n\n`); } catch {}
+        }
+      }
+    }
+  });
+});
+
+// Signal exchange (AirDrop request/accept/reject, WebRTC offer/answer/ICE)
+app.post('/api/air/signal', (req, res) => {
+  const { from, to, room, data } = req.body;
+  if (!to || !data) return res.status(400).json({ error: 'Missing to or data' });
+
+  const networkKey = getClientNetworkKey(req, room);
+  const network = airNetworks.get(networkKey);
+  if (!network) return res.status(404).json({ error: 'Network not found' });
+
+  const target = network.get(to);
+  if (!target) return res.status(404).json({ error: 'Peer not found or offline' });
+
+  try {
+    target.res.write(`data: ${JSON.stringify({
+      type: 'signal',
+      from,
+      data
+    })}\n\n`);
+    res.json({ ok: true, delivered: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Fallback high-speed relay upload/download if WebRTC direct channel is blocked
+const airUpload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 200 * 1024 * 1024 } });
+app.post('/api/air/relay-upload', airUpload.single('file'), (req, res) => {
+  if (!req.file) return res.status(400).json({ error: 'No file' });
+  const relayId = uuidv4().slice(0, 10);
+  const { targetPeerId, senderPeerId, fileName } = req.body;
+
+  airRelays.set(relayId, {
+    relayId,
+    targetPeerId,
+    senderPeerId,
+    fileName: fileName || req.file.originalname,
+    fileSize: req.file.size,
+    mimeType: req.file.mimetype || 'application/octet-stream',
+    buffer: req.file.buffer,
+    createdAt: Date.now()
+  });
+
+  // Auto clean relay after 5 minutes
+  setTimeout(() => {
+    airRelays.delete(relayId);
+  }, 300000);
+
+  res.json({ ok: true, relayId, size: req.file.size });
+});
+
+app.get('/api/air/relay-download/:id', (req, res) => {
+  const item = airRelays.get(req.params.id);
+  if (!item) return res.status(404).json({ error: 'Relay expired or not found' });
+
+  res.setHeader('Content-Type', item.mimeType);
+  res.setHeader('Content-Length', item.fileSize);
+  res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(item.fileName)}"`);
+  res.send(item.buffer);
+});
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function isExpired(entry) {

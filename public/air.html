@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Air — Быстрый обмен по Wi-Fi (AirDrop) | FastWebFile</title>
+  <meta name="description" content="Мгновенный обмен файлами между устройствами в одной сети Wi-Fi без ссылок и кодов." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/style.css" />
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="/tg-init.js"></script>
+  <style>
+    .air-wrap {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 0 16px 36px;
+      position: relative;
+      z-index: 1;
+    }
+    .air-hero {
+      text-align: center;
+      padding: 18px 0 12px;
+    }
+    .air-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(91,106,240,0.14);
+      border: 1px solid rgba(91,106,240,0.35);
+      color: #90a0ff;
+      padding: 4px 11px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .air-hero h1 {
+      font-size: clamp(1.4rem, 2.5vw, 1.85rem);
+      font-weight: 800;
+      letter-spacing: -0.6px;
+      margin-bottom: 4px;
+      color: var(--t1);
+    }
+    .air-hero h1 em { font-style: normal; color: var(--accent); }
+    .air-hero p {
+      font-size: 12.5px;
+      color: var(--t3);
+      max-width: 440px;
+      margin: 0 auto;
+      line-height: 1.4;
+    }
+
+    /* Radar Area */
+    .radar-stage {
+      position: relative;
+      min-height: 280px;
+      background: var(--c1);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      margin-bottom: 14px;
+      overflow: hidden;
+    }
+    .radar-ripples {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      width: 260px;
+      height: 260px;
+    }
+    .radar-circle {
+      position: absolute;
+      inset: 0;
+      border: 1px solid rgba(91,106,240,0.2);
+      border-radius: 50%;
+      animation: radarPulse 3s cubic-bezier(0.2, 0.8, 0.4, 1) infinite;
+    }
+    .radar-circle:nth-child(2) { animation-delay: 1s; }
+    .radar-circle:nth-child(3) { animation-delay: 2s; }
+
+    @keyframes radarPulse {
+      0% { transform: scale(0.3); opacity: 0.9; }
+      100% { transform: scale(1.4); opacity: 0; }
+    }
+
+    .radar-empty {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      max-width: 320px;
+    }
+    .radar-empty-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--c3);
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 12px;
+      box-shadow: 0 0 20px rgba(91,106,240,0.25);
+    }
+    .radar-empty-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--t1);
+      margin-bottom: 4px;
+    }
+    .radar-empty-desc {
+      font-size: 11.5px;
+      color: var(--t3);
+      line-height: 1.4;
+    }
+
+    /* Peers List Grid */
+    .peers-grid {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      justify-content: center;
+      width: 100%;
+    }
+    .peer-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      background: var(--c2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 14px;
+      width: 140px;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.2, 0.9, 0.3, 1);
+      text-align: center;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+    }
+    .peer-card:hover, .peer-card:active {
+      transform: translateY(-3px) scale(1.03);
+      border-color: var(--accent-border);
+      box-shadow: 0 8px 24px rgba(91,106,240,0.3);
+      background: var(--c3);
+    }
+    .peer-avatar {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      background: var(--accent-dim);
+      border: 2px solid var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      box-shadow: 0 0 16px rgba(91,106,240,0.35);
+      position: relative;
+    }
+    .peer-online-dot {
+      position: absolute;
+      bottom: 1px;
+      right: 1px;
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: var(--green);
+      border: 2px solid var(--c2);
+      box-shadow: 0 0 6px var(--green);
+    }
+    .peer-name {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--t1);
+      max-width: 120px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .peer-sub {
+      font-size: 10px;
+      color: var(--t3);
+    }
+    .peer-action-pill {
+      margin-top: 2px;
+      font-size: 10px;
+      font-weight: 600;
+      color: #abb2ff;
+      background: rgba(91,106,240,0.15);
+      padding: 2px 7px;
+      border-radius: 10px;
+    }
+
+    /* Self identity bottom card */
+    .self-card {
+      background: var(--c1);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .self-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .self-avatar-sm {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--c3);
+      border: 1px solid var(--border-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 17px;
+    }
+    .self-title {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--t1);
+    }
+    .self-desc {
+      font-size: 11px;
+      color: var(--t3);
+    }
+    .self-actions {
+      display: flex;
+      gap: 6px;
+    }
+    .btn-self {
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      border: 1px solid var(--border);
+      background: var(--c2);
+      color: var(--t1);
+      cursor: pointer;
+    }
+    .btn-self:hover { background: var(--c3); border-color: var(--accent-border); }
+
+    /* AirDrop Dialog Modal */
+    .air-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(10px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .air-modal {
+      background: var(--c1);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 380px;
+      padding: 22px 20px 20px;
+      text-align: center;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.6);
+      animation: modalPop 0.25s cubic-bezier(0.2, 0.9, 0.3, 1);
+    }
+    @keyframes modalPop {
+      0% { transform: scale(0.92); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .air-modal-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: var(--accent-dim);
+      border: 2px solid var(--accent);
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      margin: 0 auto 12px;
+      box-shadow: 0 0 20px rgba(91,106,240,0.3);
+    }
+    .air-modal-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--t1);
+      margin-bottom: 4px;
+    }
+    .air-modal-text {
+      font-size: 12.5px;
+      color: var(--t2);
+      margin-bottom: 14px;
+      line-height: 1.45;
+    }
+    .air-file-badge {
+      background: var(--c2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-align: left;
+    }
+    .air-file-badge-info { min-width: 0; flex: 1; }
+    .air-file-badge-name {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--t1);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .air-file-badge-size {
+      font-size: 11px;
+      color: var(--t3);
+      margin-top: 1px;
+    }
+    .air-modal-btn-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .btn-air-accept {
+      background: var(--green);
+      color: #0c0c0f;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    .btn-air-accept:hover { opacity: 0.9; }
+    .btn-air-reject {
+      background: var(--c2);
+      border: 1px solid var(--border);
+      color: var(--t2);
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-air-reject:hover { background: var(--c3); color: var(--t1); }
+
+    /* Progress overlay */
+    .air-progress-box {
+      margin-top: 12px;
+      text-align: left;
+    }
+    .air-progress-bar {
+      height: 7px;
+      background: var(--c3);
+      border-radius: 4px;
+      overflow: hidden;
+      margin: 6px 0;
+    }
+    .air-progress-fill {
+      height: 100%;
+      background: var(--accent);
+      width: 0%;
+      transition: width 0.1s linear;
+    }
+    .air-progress-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--t3);
+      font-family: var(--mono);
+    }
+  </style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-mark">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M3 8h10M8 3l5 5-5 5" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </div>
+      <a href="/" class="logo-name">Fast<span>Web</span>File</a>
+      <span class="logo-tag">AIR</span>
+    </div>
+    <div class="main-mode-nav-wrap">
+      <nav class="main-mode-nav">
+        <a href="/" class="mode-nav-btn"><span>Файлы</span></a>
+        <a href="/?drop=1" class="mode-nav-btn"><span>Drop-папка</span></a>
+        <a href="/p2p" class="mode-nav-btn"><span>P2P</span></a>
+        <a href="/air" class="mode-nav-btn active"><span>Air (Wi-Fi) 📡</span></a>
+      </nav>
+    </div>
+    <div class="header-status">
+      <span class="status-dot"></span>
+      <span style="font-size:11px;color:var(--t2);">Wi-Fi Air</span>
+    </div>
+  </div>
+</header>
+
+<div class="air-wrap">
+
+  <div class="air-hero anim">
+    <div class="air-badge">
+      <svg viewBox="0 0 16 16" fill="none" style="width:12px;height:12px"><path d="M8 12a2 2 0 100-4 2 2 0 000 4z" fill="currentColor"/><path d="M4.93 6.93a4.5 4.5 0 016.14 0M2.81 4.81a7.5 7.5 0 0110.38 0" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      Apple AirDrop для любого браузера
+    </div>
+    <h1>Передавай <em>в один клик</em> по Wi-Fi</h1>
+    <p>Устройства в одной сети Wi-Fi находят друг друга автоматически. Не нужны ссылки, QR-коды и PIN — просто нажми на аватар.</p>
+  </div>
+
+  <!-- Radar Discovery Stage -->
+  <div class="radar-stage" id="radarStage">
+    <!-- Waves animation -->
+    <div class="radar-ripples" id="radarRipples">
+      <div class="radar-circle"></div>
+      <div class="radar-circle"></div>
+      <div class="radar-circle"></div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="radar-empty" id="radarEmpty">
+      <div class="radar-empty-icon">
+        <svg viewBox="0 0 20 20" fill="none" style="width:24px;height:24px"><path d="M10 15a2 2 0 100-4 2 2 0 000 4z" fill="currentColor"/><path d="M6.34 8.34a5.5 5.5 0 017.32 0M3.51 5.51a9.5 9.5 0 0112.98 0" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </div>
+      <div class="radar-empty-title">Ищем устройства в сети Wi-Fi...</div>
+      <div class="radar-empty-desc">
+        Откройте вкладку <b>Air</b> на втором телефоне или компьютере, подключённом к этому же Wi-Fi роутеру.
+      </div>
+    </div>
+
+    <!-- Discovered Peers Grid -->
+    <div class="peers-grid" id="peersGrid" style="display:none;"></div>
+  </div>
+
+  <!-- Bottom: Self Identity Card -->
+  <div class="self-card">
+    <div class="self-left">
+      <div class="self-avatar-sm" id="selfIcon">📱</div>
+      <div>
+        <div class="self-title" id="selfNameTitle">Мое устройство</div>
+        <div class="self-desc" id="selfSubTitle">Сеть: Wi-Fi (авто)</div>
+      </div>
+    </div>
+    <div class="self-actions">
+      <button class="btn-self" id="btnEditName">✏️ Имя</button>
+      <button class="btn-self" id="btnCustomRoom">🌐 Комната</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- Hidden File Picker -->
+<input type="file" id="airFileInput" multiple style="display:none;" />
+
+<!-- Incoming Request Modal (Receiver) -->
+<div class="air-modal-overlay" id="incomingModal" style="display:none;">
+  <div class="air-modal">
+    <div class="air-modal-icon">📲</div>
+    <div class="air-modal-title">AirDrop</div>
+    <div class="air-modal-text">
+      <b id="incSenderName" style="color:var(--t1);">iPhone</b> хочет отправить вам файл:
+    </div>
+    <div class="air-file-badge">
+      <div style="font-size:22px;">📄</div>
+      <div class="air-file-badge-info">
+        <div class="air-file-badge-name" id="incFileName">document.pdf</div>
+        <div class="air-file-badge-size" id="incFileSize">12.5 МБ</div>
+      </div>
+    </div>
+    <div class="air-modal-btn-row">
+      <button class="btn-air-reject" id="btnRejectAir">Отклонить</button>
+      <button class="btn-air-accept" id="btnAcceptAir">Принять</button>
+    </div>
+  </div>
+</div>
+
+<!-- Sending / Progress Modal -->
+<div class="air-modal-overlay" id="transferModal" style="display:none;">
+  <div class="air-modal">
+    <div class="air-modal-icon" id="transferIcon">⏳</div>
+    <div class="air-modal-title" id="transferTitle">Отправка...</div>
+    <div class="air-modal-text" id="transferDesc">Ожидание ответа получателя...</div>
+
+    <div class="air-file-badge">
+      <div style="font-size:20px;">📦</div>
+      <div class="air-file-badge-info">
+        <div class="air-file-badge-name" id="trFileName">file.zip</div>
+        <div class="air-file-badge-size" id="trFileSize">10 МБ</div>
+      </div>
+    </div>
+
+    <div class="air-progress-box" id="trProgressBox" style="display:none;">
+      <div class="air-progress-bar">
+        <div class="air-progress-fill" id="trProgressFill"></div>
+      </div>
+      <div class="air-progress-meta">
+        <span id="trPercent">0%</span>
+        <span id="trSpeed">0 МБ/с</span>
+      </div>
+    </div>
+
+    <button class="btn-air-reject" id="btnCancelTransfer" style="margin-top:14px;width:100%;">Отмена</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── Device & Identity Setup ─────────────────────────────────────────
+const ANIMAL_NAMES = ['Кот', 'Лис', 'Сокол', 'Панда', 'Тигр', 'Орёл', 'Дельфин', 'Барс', 'Енот', 'Волк', 'Бобр', 'Лев'];
+const ICONS = ['📱', '💻', '🖥', '🍎', '⚡', '🚀', '🦊', '🐱', '🐼', '🦅'];
+
+function detectDevice() {
+  const ua = navigator.userAgent;
+  if (/iphone/i.test(ua)) return { type: 'phone', os: 'iOS', icon: '📱', prefix: 'iPhone' };
+  if (/ipad/i.test(ua)) return { type: 'tablet', os: 'iPadOS', icon: '📱', prefix: 'iPad' };
+  if (/android/i.test(ua)) return { type: 'phone', os: 'Android', icon: '📱', prefix: 'Android' };
+  if (/macintosh|mac os x/i.test(ua)) return { type: 'laptop', os: 'macOS', icon: '💻', prefix: 'MacBook' };
+  if (/windows/i.test(ua)) return { type: 'desktop', os: 'Windows', icon: '🖥', prefix: 'Windows PC' };
+  return { type: 'device', os: 'Web', icon: '⚡', prefix: 'Устройство' };
+}
+
+const devInfo = detectDevice();
+let myPeerId = localStorage.getItem('fwf_air_peer_id') || Math.random().toString(36).slice(2, 10);
+localStorage.setItem('fwf_air_peer_id', myPeerId);
+
+let myName = localStorage.getItem('fwf_air_name') || `${devInfo.prefix} (${ANIMAL_NAMES[Math.floor(Math.random() * ANIMAL_NAMES.length)]})`;
+let myIcon = localStorage.getItem('fwf_air_icon') || devInfo.icon;
+let currentCustomRoom = '';
+
+document.getElementById('selfIcon').textContent = myIcon;
+document.getElementById('selfNameTitle').textContent = myName;
+
+// ── State ────────────────────────────────────────────────────────────
+let peers = new Map(); // peerId -> peerData
+let eventSource = null;
+let targetPeerForSend = null;
+let currentSelectedFile = null;
+let pendingIncoming = null; // { from, fileName, fileSize, mimeType, relayId }
+
+// ── Connect to Network Presence Stream ───────────────────────────────
+function connectAirStream() {
+  if (eventSource) eventSource.close();
+
+  const params = new URLSearchParams({
+    peerId: myPeerId,
+    name: myName,
+    deviceType: devInfo.type,
+    os: devInfo.os,
+    icon: myIcon,
+    room: currentCustomRoom
+  });
+
+  eventSource = new EventSource(`/api/air/stream?${params.toString()}`);
+
+  eventSource.onmessage = function (e) {
+    if (!e.data || e.data.startsWith(':')) return;
+    try {
+      const msg = JSON.parse(e.data);
+      handleAirMessage(msg);
+    } catch (err) {
+      console.error('Air parse error', err);
+    }
+  };
+
+  eventSource.onerror = function () {
+    setTimeout(connectAirStream, 3000);
+  };
+}
+
+function handleAirMessage(msg) {
+  if (msg.type === 'connected') {
+    peers.clear();
+    (msg.peers || []).forEach(p => peers.set(p.peerId, p));
+    document.getElementById('selfSubTitle').textContent = msg.isWifi ? 'Сеть: Локальный Wi-Fi (авто)' : `Комната: ${currentCustomRoom}`;
+    renderPeers();
+  } else if (msg.type === 'peer_joined') {
+    peers.set(msg.peer.peerId, msg.peer);
+    renderPeers();
+    if (window.Telegram?.WebApp?.HapticFeedback) {
+      try { window.Telegram.WebApp.HapticFeedback.impactOccurred('light'); } catch (_) {}
+    }
+  } else if (msg.type === 'peer_left') {
+    peers.delete(msg.peerId);
+    renderPeers();
+  } else if (msg.type === 'signal') {
+    handleSignal(msg.from, msg.data);
+  }
+}
+
+function renderPeers() {
+  const grid = document.getElementById('peersGrid');
+  const empty = document.getElementById('radarEmpty');
+
+  if (peers.size === 0) {
+    grid.style.display = 'none';
+    empty.style.display = 'block';
+    return;
+  }
+
+  empty.style.display = 'none';
+  grid.style.display = 'flex';
+
+  grid.innerHTML = Array.from(peers.values()).map(p => `
+    <div class="peer-card anim" onclick="choosePeerToSend('${p.peerId}')">
+      <div class="peer-avatar">
+        ${p.icon || '📱'}
+        <span class="peer-online-dot"></span>
+      </div>
+      <div class="peer-name" title="${escapeHtml(p.name)}">${escapeHtml(p.name)}</div>
+      <div class="peer-sub">${escapeHtml(p.os || '')}</div>
+      <div class="peer-action-pill">Отправить</div>
+    </div>
+  `).join('');
+}
+
+// ── Choose Peer & Send File ──────────────────────────────────────────
+function choosePeerToSend(peerId) {
+  targetPeerForSend = peers.get(peerId);
+  if (!targetPeerForSend) return;
+  document.getElementById('airFileInput').click();
+}
+
+document.getElementById('airFileInput').addEventListener('change', function (e) {
+  const file = e.target.files && e.target.files[0];
+  if (!file || !targetPeerForSend) return;
+  currentSelectedFile = file;
+
+  // Show Sending Modal
+  document.getElementById('transferTitle').textContent = 'Отправка запроса...';
+  document.getElementById('transferDesc').textContent = `Запрос на «${targetPeerForSend.name}»`;
+  document.getElementById('trFileName').textContent = file.name;
+  document.getElementById('trFileSize').textContent = formatBytes(file.size);
+  document.getElementById('trProgressBox').style.display = 'none';
+  document.getElementById('transferModal').style.display = 'flex';
+
+  // Send request signal
+  sendSignal(targetPeerForSend.peerId, {
+    action: 'airdrop_request',
+    fileName: file.name,
+    fileSize: file.size,
+    fileType: file.type || 'application/octet-stream',
+    senderName: myName,
+    senderIcon: myIcon
+  });
+
+  e.target.value = '';
+});
+
+// ── Handle Incoming Signaling ────────────────────────────────────────
+function handleSignal(fromPeerId, data) {
+  if (data.action === 'airdrop_request') {
+    // Incoming file offer
+    pendingIncoming = {
+      from: fromPeerId,
+      fileName: data.fileName,
+      fileSize: data.fileSize,
+      fileType: data.fileType,
+      senderName: data.senderName || 'Устройство'
+    };
+
+    document.getElementById('incSenderName').textContent = pendingIncoming.senderName;
+    document.getElementById('incFileName').textContent = pendingIncoming.fileName;
+    document.getElementById('incFileSize').textContent = formatBytes(pendingIncoming.fileSize);
+    document.getElementById('incomingModal').style.display = 'flex';
+
+    // Play subtle alert haptics / sound
+    if (window.Telegram?.WebApp?.HapticFeedback) {
+      try { window.Telegram.WebApp.HapticFeedback.notificationOccurred('warning'); } catch (_) {}
+    }
+  } else if (data.action === 'airdrop_accept') {
+    // Receiver accepted! Start streaming
+    if (targetPeerForSend && currentSelectedFile) {
+      startSendingFile(targetPeerForSend.peerId, currentSelectedFile);
+    }
+  } else if (data.action === 'airdrop_reject') {
+    document.getElementById('transferModal').style.display = 'none';
+    showToast('Получатель отклонил передачу');
+    currentSelectedFile = null;
+  } else if (data.action === 'airdrop_ready_to_download') {
+    // Receiver gets relay link to download
+    finishReceiveRelay(data.relayId, data.fileName);
+  }
+}
+
+// Accept / Reject Handlers
+document.getElementById('btnAcceptAir').addEventListener('click', function () {
+  document.getElementById('incomingModal').style.display = 'none';
+  if (!pendingIncoming) return;
+
+  // Notify sender accepted
+  sendSignal(pendingIncoming.from, { action: 'airdrop_accept' });
+
+  // Show progress modal
+  document.getElementById('transferTitle').textContent = 'Получение файла...';
+  document.getElementById('transferDesc').textContent = `От «${pendingIncoming.senderName}»`;
+  document.getElementById('trFileName').textContent = pendingIncoming.fileName;
+  document.getElementById('trFileSize').textContent = formatBytes(pendingIncoming.fileSize);
+  document.getElementById('trProgressBox').style.display = 'block';
+  document.getElementById('trProgressFill').style.width = '10%';
+  document.getElementById('trPercent').textContent = 'Приём данных...';
+  document.getElementById('transferModal').style.display = 'flex';
+});
+
+document.getElementById('btnRejectAir').addEventListener('click', function () {
+  document.getElementById('incomingModal').style.display = 'none';
+  if (pendingIncoming) {
+    sendSignal(pendingIncoming.from, { action: 'airdrop_reject' });
+    pendingIncoming = null;
+  }
+});
+
+// ── Stream / Relay Transmission ──────────────────────────────────────
+async function startSendingFile(targetId, file) {
+  document.getElementById('transferTitle').textContent = 'Передача файла...';
+  document.getElementById('transferDesc').textContent = `Отправка на «${targetPeerForSend.name}»`;
+  document.getElementById('trProgressBox').style.display = 'block';
+
+  // Fast direct relay stream
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('targetPeerId', targetId);
+  formData.append('senderPeerId', myPeerId);
+  formData.append('fileName', file.name);
+
+  const xhr = new XMLHttpRequest();
+  xhr.open('POST', '/api/air/relay-upload');
+
+  const startTime = Date.now();
+  xhr.upload.onprogress = function (e) {
+    if (e.lengthComputable) {
+      const pct = Math.round((e.loaded / e.total) * 100);
+      document.getElementById('trProgressFill').style.width = pct + '%';
+      document.getElementById('trPercent').textContent = pct + '%';
+
+      const sec = Math.max(0.2, (Date.now() - startTime) / 1000);
+      const speedMb = ((e.loaded / 1024 / 1024) / sec).toFixed(1);
+      document.getElementById('trSpeed').textContent = speedMb + ' МБ/с';
+    }
+  };
+
+  xhr.onload = function () {
+    if (xhr.status === 200) {
+      const res = JSON.parse(xhr.responseText);
+      // Notify receiver that file is ready to download!
+      sendSignal(targetId, {
+        action: 'airdrop_ready_to_download',
+        relayId: res.relayId,
+        fileName: file.name
+      });
+
+      document.getElementById('transferModal').style.display = 'none';
+      showToast(`✅ Файл «${file.name}» успешно передан!`);
+      if (window.Telegram?.WebApp?.HapticFeedback) {
+        try { window.Telegram.WebApp.HapticFeedback.notificationOccurred('success'); } catch (_) {}
+      }
+      currentSelectedFile = null;
+    } else {
+      document.getElementById('transferModal').style.display = 'none';
+      showToast('Ошибка при передаче файла');
+    }
+  };
+
+  xhr.onerror = function () {
+    document.getElementById('transferModal').style.display = 'none';
+    showToast('Сетевая ошибка передачи');
+  };
+
+  xhr.send(formData);
+}
+
+function finishReceiveRelay(relayId, fileName) {
+  document.getElementById('trProgressFill').style.width = '100%';
+  document.getElementById('trPercent').textContent = '100%';
+
+  // Download directly
+  const a = document.createElement('a');
+  a.href = `/api/air/relay-download/${encodeURIComponent(relayId)}`;
+  a.download = fileName;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+
+  setTimeout(() => {
+    document.getElementById('transferModal').style.display = 'none';
+    showToast(`✅ Файл «${fileName}» сохранён!`);
+    if (window.Telegram?.WebApp?.HapticFeedback) {
+      try { window.Telegram.WebApp.HapticFeedback.notificationOccurred('success'); } catch (_) {}
+    }
+    pendingIncoming = null;
+  }, 400);
+}
+
+document.getElementById('btnCancelTransfer').addEventListener('click', function () {
+  document.getElementById('transferModal').style.display = 'none';
+  if (targetPeerForSend) {
+    sendSignal(targetPeerForSend.peerId, { action: 'airdrop_reject' });
+  }
+  currentSelectedFile = null;
+});
+
+// ── Signaling Sender ─────────────────────────────────────────────────
+async function sendSignal(toPeerId, data) {
+  try {
+    await fetch('/api/air/signal', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        from: myPeerId,
+        to: toPeerId,
+        room: currentCustomRoom,
+        data
+      })
+    });
+  } catch (err) {
+    console.error('Signal error', err);
+  }
+}
+
+// ── Edit Name / Custom Room Dialogs ──────────────────────────────────
+document.getElementById('btnEditName').addEventListener('click', function () {
+  const newName = prompt('Введите имя вашего устройства:', myName);
+  if (newName && newName.trim()) {
+    myName = newName.trim().slice(0, 30);
+    localStorage.setItem('fwf_air_name', myName);
+    document.getElementById('selfNameTitle').textContent = myName;
+    connectAirStream();
+  }
+});
+
+document.getElementById('btnCustomRoom').addEventListener('click', function () {
+  const room = prompt('Имя виртуальной комнаты (оставьте пустым для авто-Wi-Fi):', currentCustomRoom);
+  if (room !== null) {
+    currentCustomRoom = room.trim();
+    connectAirStream();
+    showToast(currentCustomRoom ? `Подключено к комнате: ${currentCustomRoom}` : 'Режим: Автоматический Wi-Fi');
+  }
+});
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+function formatBytes(bytes) {
+  if (!bytes) return '0 B';
+  const k = 1024;
+  const sizes = ['B', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+}
+
+function escapeHtml(s) {
+  return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+// Start discovery
+connectAirStream();
+</script>
+</body>
+</html>

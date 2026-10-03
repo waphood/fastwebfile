@@ -260,7 +260,8 @@ async function handleMessage(msg, getDbStatsCallback, cleanupExpiredCallback) {
       `• Самоуничтожение файлов (1 скачивание, 1 или 3 дня)\n` +
       `• Защита паролем и удаление EXIF-метаданных\n` +
       `• Drop-папки (сбор файлов от клиентов и друзей)\n` +
-      `• P2P прямая передача больших файлов (50 ГБ+)`;
+      `• P2P прямая передача больших файлов (50 ГБ+)\n` +
+      `• Air (Wi-Fi) — моментальный AirDrop в 1 клик между устройствами`;
 
     const keyboard = [];
 
@@ -269,6 +270,12 @@ async function handleMessage(msg, getDbStatsCallback, cleanupExpiredCallback) {
         {
           text: '📂 Открыть FastWebFile (Web App)',
           web_app: { url: config.appUrl }
+        }
+      ]);
+      keyboard.push([
+        {
+          text: '📡 Открыть Air (Wi-Fi AirDrop)',
+          web_app: { url: `${config.appUrl}/air` }
         }
       ]);
     } else {
