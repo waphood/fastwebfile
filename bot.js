@@ -13,18 +13,26 @@ function loadConfig() {
   let cfg = {
     botToken: process.env.BOT_TOKEN || '8921742373:AAEGsuPulshO3WN_fTpRI-1zGvyfZzojY4s',
     adminId: Number(process.env.ADMIN_ID) || 7936378054,
-    appUrl: process.env.RENDER_EXTERNAL_URL || process.env.APP_URL || 'http://localhost:3000'
+    appUrl: process.env.RENDER_EXTERNAL_URL || (process.env.RENDER_EXTERNAL_HOSTNAME ? `https://${process.env.RENDER_EXTERNAL_HOSTNAME}` : (process.env.APP_URL || '')),
+    disableLocalPolling: true
   };
+
   try {
     if (fs.existsSync(CONFIG_PATH)) {
       const fileCfg = JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf8'));
+      // Clean dead tunnel / localhost URLs
+      if (fileCfg.appUrl && (fileCfg.appUrl.includes('serveousercontent') || fileCfg.appUrl.includes('localhost') || fileCfg.appUrl.includes('pinggy'))) {
+        delete fileCfg.appUrl;
+      }
       cfg = { ...cfg, ...fileCfg };
     }
   } catch {}
 
-  // If running in cloud with automated URL, always use it
+  // If running on Render, always prioritize Render's actual hostname/URL
   if (process.env.RENDER_EXTERNAL_URL) {
     cfg.appUrl = process.env.RENDER_EXTERNAL_URL.replace(/\/+$/, '');
+  } else if (process.env.RENDER_EXTERNAL_HOSTNAME) {
+    cfg.appUrl = `https://${process.env.RENDER_EXTERNAL_HOSTNAME}`.replace(/\/+$/, '');
   }
 
   return cfg;
@@ -39,6 +47,16 @@ function saveConfig(cfg) {
 }
 
 let config = loadConfig();
+
+function updateAppUrl(newUrl) {
+  if (!newUrl || !newUrl.startsWith('https://')) return;
+  const cleanUrl = newUrl.replace(/\/+$/, '');
+  if (config.appUrl === cleanUrl) return;
+  console.log(`[Bot] Auto-detected live HTTPS URL: ${cleanUrl}`);
+  config.appUrl = cleanUrl;
+  saveConfig(config);
+  setupBotMenu().catch(e => console.error('[Bot] Failed to refresh menu with new URL:', e.message));
+}
 
 // Stateless HMAC-signed admin session tokens (userId.expires.sig)
 function generateAdminToken(userId) {
@@ -98,11 +116,16 @@ async function tgCall(method, params = {}) {
     });
     const data = await res.json();
     if (!data.ok) {
-      console.error(`[Bot] Telegram API error (${method}):`, data.description || data);
+      // Do not log 409 Conflict during getUpdates as an error; polling handles it gracefully
+      if (!(method === 'getUpdates' && data.error_code === 409)) {
+        console.error(`[Bot] Telegram API error (${method}):`, data.description || data);
+      }
     }
     return data;
   } catch (err) {
-    console.error(`[Bot] Network error calling ${method}:`, err.message);
+    if (isPolling) {
+      console.error(`[Bot] Network error calling ${method}:`, err.message);
+    }
     return null;
   }
 }
@@ -146,27 +169,63 @@ async function setupBotMenu() {
   }
 }
 
-// Polling loop
+// Polling loop with graceful shutdown & 409 conflict handling
 let isPolling = false;
+let pollingAbort = false;
 let lastUpdateId = 0;
 
+function stopBot() {
+  if (isPolling) {
+    console.log('[Bot] Stopping Telegram bot polling...');
+    isPolling = false;
+    pollingAbort = true;
+  }
+}
+
 async function startBot(getDbStatsCallback, cleanupExpiredCallback) {
+  // If running locally on development machine and disableLocalPolling is set, skip
+  const isCloud = !!(process.env.RENDER || process.env.RENDER_EXTERNAL_HOSTNAME || process.env.NODE_ENV === 'production');
+  if (!isCloud && config.disableLocalPolling) {
+    console.log('[Bot] Local bot polling disabled (running on local dev machine). Cloud Render service handles updates.');
+    return;
+  }
+
   if (isPolling) return;
   isPolling = true;
+  pollingAbort = false;
 
-  console.log(`[Bot] Starting Telegram bot @fastwebfilebot polling...`);
+  console.log(`[Bot] Starting Telegram bot polling... (Admin ID: ${config.adminId})`);
   await setupBotMenu();
 
-  while (isPolling) {
+  while (isPolling && !pollingAbort) {
     try {
       const res = await tgCall('getUpdates', {
         offset: lastUpdateId + 1,
-        timeout: 10,
+        timeout: 15,
         allowed_updates: ['message', 'callback_query']
       });
 
-      if (res && res.ok && Array.isArray(res.result)) {
+      if (pollingAbort || !isPolling) break;
+
+      if (!res) {
+        await new Promise(r => setTimeout(r, 3000));
+        continue;
+      }
+
+      if (!res.ok) {
+        // Handle 409 Conflict gracefully (e.g. during Render zero-downtime rolling container deploy)
+        if (res.error_code === 409) {
+          console.log('[Bot] 409 Conflict: waiting for previous container/instance to shut down (retrying in 5s)...');
+          await new Promise(r => setTimeout(r, 5000));
+          continue;
+        }
+        await new Promise(r => setTimeout(r, 3000));
+        continue;
+      }
+
+      if (Array.isArray(res.result)) {
         for (const update of res.result) {
+          if (!isPolling || pollingAbort) break;
           lastUpdateId = update.update_id;
           if (update.message) {
             await handleMessage(update.message, getDbStatsCallback, cleanupExpiredCallback);
@@ -174,7 +233,9 @@ async function startBot(getDbStatsCallback, cleanupExpiredCallback) {
         }
       }
     } catch (err) {
-      console.error('[Bot] Polling loop error:', err.message);
+      if (!pollingAbort) {
+        console.error('[Bot] Polling loop error:', err.message);
+      }
       await new Promise(r => setTimeout(r, 3000));
     }
   }
@@ -210,6 +271,8 @@ async function handleMessage(msg, getDbStatsCallback, cleanupExpiredCallback) {
           web_app: { url: config.appUrl }
         }
       ]);
+    } else {
+      replyText += `\n\n<i>⚠️ WebApp URL еще не настроен. Откройте сайт в браузере или настройте /seturl.</i>`;
     }
 
     if (isAdmin) {
@@ -241,34 +304,46 @@ async function handleMessage(msg, getDbStatsCallback, cleanupExpiredCallback) {
       return;
     }
 
-    const token = generateAdminToken(fromId);
     const stats = typeof getDbStatsCallback === 'function' ? getDbStatsCallback() : { totalFiles: 0, totalSizeMb: '0', dropCount: 0 };
+
+    if (!isHttps) {
+      await tgCall('sendMessage', {
+        chat_id: chatId,
+        text: `🛠 <b>Панель администратора FastWebFile</b>\n\n` +
+              `⚠️ <b>HTTPS URL сервиса еще не определен</b> (текущий: <code>${config.appUrl || 'не задан'}</code>).\n\n` +
+              `Чтобы подключить WebApp, отправьте адрес вашего проекта на Render:\n` +
+              `<code>/seturl https://ваш-проект.onrender.com</code>\n\n` +
+              `<i>После этого кнопка админки сразу заработает!</i>`,
+        parse_mode: 'HTML'
+      });
+      return;
+    }
+
+    const token = generateAdminToken(fromId);
     const adminUrl = `${config.appUrl}/admin.html?token=${token}`;
 
     const adminMsg = `🛠 <b>Панель администратора FastWebFile</b>\n\n` +
       `📊 <b>Сводка сервера:</b>\n` +
       `• Файлов на сервере: <b>${stats.totalFiles}</b>\n` +
       `• Занято места: <b>${stats.totalSizeMb} МБ</b>\n` +
-      `• Активных Drop-папок: <b>${stats.dropCount}</b>\n\n` +
+      `• Активных Drop-папок: <b>${stats.dropCount}</b>\n` +
+      `• Сервер: <code>${config.appUrl}</code>\n\n` +
       `В панели вы можете модерировать файлы, просматривать ссылки, PIN-коды и удалять любые файлы с сервера в 1 клик.`;
 
-    const adminKeyboard = [];
-
-    if (isHttps) {
-      adminKeyboard.push([
+    const adminKeyboard = [
+      [
         {
           text: '🛡 Открыть Админ-панель (Web App)',
           web_app: { url: adminUrl }
         }
-      ]);
-    } else {
-      adminKeyboard.push([
+      ],
+      [
         {
-          text: '🛡 Открыть Админ-панель (Браузер)',
+          text: '🌐 Открыть в обычном браузере',
           url: adminUrl
         }
-      ]);
-    }
+      ]
+    ];
 
     await tgCall('sendMessage', {
       chat_id: chatId,
@@ -292,7 +367,10 @@ async function handleMessage(msg, getDbStatsCallback, cleanupExpiredCallback) {
     if (!newUrl || !newUrl.startsWith('http')) {
       await tgCall('sendMessage', {
         chat_id: chatId,
-        text: `❗ <b>Укажите URL.</b> Пример:\n<code>/seturl https://my-fastwebfile.onrender.com</code>\n\n<i>Для Web App Telegram требуется https://</i>`,
+        text: `ℹ️ <b>Настройка адреса WebApp</b>\n\n` +
+              `Текущий адрес: <code>${config.appUrl || 'не настроен'}</code>\n\n` +
+              `Чтобы обновить адрес сервиса (например, с Render), отправьте:\n` +
+              `<code>/seturl https://ваш-проект.onrender.com</code>`,
         parse_mode: 'HTML'
       });
       return;
@@ -302,10 +380,19 @@ async function handleMessage(msg, getDbStatsCallback, cleanupExpiredCallback) {
     saveConfig(config);
     await setupBotMenu();
 
+    const token = generateAdminToken(fromId);
+    const testAdminUrl = `${config.appUrl}/admin.html?token=${token}`;
+
     await tgCall('sendMessage', {
       chat_id: chatId,
       text: `✅ <b>URL приложения успешно обновлен!</b>\nНовый адрес: <code>${config.appUrl}</code>\n\nКнопка меню бота и команды обновлены.`,
-      parse_mode: 'HTML'
+      parse_mode: 'HTML',
+      reply_markup: {
+        inline_keyboard: [
+          [{ text: '🛡 Проверить Админку', web_app: { url: testAdminUrl } }],
+          [{ text: '📂 Проверить FastWebFile', web_app: { url: config.appUrl } }]
+        ]
+      }
     });
     return;
   }
@@ -330,7 +417,7 @@ async function handleMessage(msg, getDbStatsCallback, cleanupExpiredCallback) {
       `• RAM (RSS / Heap): <b>${rssMb} MB / ${heapMb} MB</b>\n` +
       `• Время работы (Uptime): <b>${uptimeH} ч.</b>\n` +
       `• Node.js: <b>${process.version}</b>\n` +
-      `• WebApp URL: <code>${config.appUrl}</code>`;
+      `• WebApp URL: <code>${config.appUrl || 'не настроен'}</code>`;
 
     await tgCall('sendMessage', {
       chat_id: chatId,
@@ -363,6 +450,8 @@ async function handleMessage(msg, getDbStatsCallback, cleanupExpiredCallback) {
 
 module.exports = {
   startBot,
+  stopBot,
+  updateAppUrl,
   validateAdminToken,
   verifyTelegramWebAppData,
   getConfig: () => config,

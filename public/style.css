@@ -31,7 +31,13 @@
   --mono: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
 }
 
-html { scroll-behavior: smooth; }
+html {
+  scroll-behavior: smooth;
+  touch-action: pan-x pan-y;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  overscroll-behavior-y: none;
+}
 body {
   font-family: var(--font);
   background: var(--c0);
@@ -39,6 +45,46 @@ body {
   min-height: 100vh;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  touch-action: pan-x pan-y;
+}
+
+/* Prevent iOS Safari auto-zoom on input focus */
+@media screen and (max-width: 768px) {
+  input[type="text"],
+  input[type="number"],
+  input[type="password"],
+  input[type="search"],
+  input[type="email"],
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}
+
+/* Telegram WebApp Mobile Fullscreen */
+html.tg-mobile-fullscreen {
+  width: 100%;
+  min-height: 100%;
+}
+html.tg-mobile-fullscreen body {
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+html.tg-mobile-fullscreen .header {
+  padding-top: max(0px, env(safe-area-inset-top, 0px));
+}
+html.tg-mobile-fullscreen .wrap,
+html.tg-mobile-fullscreen .admin-wrap {
+  padding-left: max(12px, env(safe-area-inset-left, 12px));
+  padding-right: max(12px, env(safe-area-inset-right, 12px));
+  padding-bottom: max(20px, env(safe-area-inset-bottom, 20px));
+}
+
+/* Telegram WebApp Window on PC / Desktop */
+html.tg-desktop-window body {
+  width: 100%;
+  max-width: 860px;
+  margin: 0 auto;
 }
 
 a, a:visited {

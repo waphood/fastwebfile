@@ -7,6 +7,7 @@ const path    = require('path');
 const fs      = require('fs');
 const crypto  = require('crypto');
 const zlib    = require('zlib');
+const { startBot, stopBot, updateAppUrl, validateAdminToken, verifyTelegramWebAppData } = require('./bot');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
@@ -80,6 +81,16 @@ const upload = multer({ storage, limits: { fileSize: 500 * 1024 * 1024 } });
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Auto-detect public HTTPS hostname (e.g. *.onrender.com or custom domain)
+app.use((req, res, next) => {
+  const host = req.get('x-forwarded-host') || req.get('host');
+  const proto = req.get('x-forwarded-proto') || (req.secure ? 'https' : 'http');
+  if (host && proto === 'https' && !host.includes('localhost') && !host.includes('127.0.0.1') && !host.includes('serveousercontent') && !host.includes('pinggy')) {
+    updateAppUrl(`https://${host}`);
+  }
+  next();
+});
 
 // ── Shared: build expiry ──────────────────────────────────────────────────────
 function buildExpiry(expiry) {
@@ -983,7 +994,7 @@ function cleanExpiredFiles() {
 }
 
 // ── Telegram Bot Integration ───────────────────────────────────────────────
-const { startBot, validateAdminToken, verifyTelegramWebAppData } = require('./bot');
+// (bot helpers imported at top of file)
 
 function requireAdmin(req, res, next) {
   const token = req.headers['x-admin-token'] || req.query.token;
@@ -1066,8 +1077,21 @@ setInterval(() => {
   }
 }, 3600000);
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`\n⚡ FastWebFile → http://localhost:${PORT}\n`);
   startBot(getDbStats, cleanExpiredFiles).catch(e => console.error('[Bot Error]', e));
 });
+
+function handleShutdown(signal) {
+  console.log(`\n[Server] Received ${signal}. Shutting down gracefully...`);
+  stopBot();
+  server.close(() => {
+    console.log('[Server] HTTP server closed.');
+    process.exit(0);
+  });
+  setTimeout(() => process.exit(0), 3000).unref();
+}
+
+process.on('SIGTERM', () => handleShutdown('SIGTERM'));
+process.on('SIGINT', () => handleShutdown('SIGINT'));
 
