@@ -1513,15 +1513,23 @@ button:active:not(:disabled), .btn-upload:active:not(:disabled), .btn-solid:acti
     width: 100%;
     display: flex;
     justify-content: center;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
   }
+  .main-mode-nav-wrap::-webkit-scrollbar { display: none; }
   .main-mode-nav {
     display: inline-flex;
     justify-content: center;
+    white-space: nowrap;
+    gap: 3px;
+    padding: 2px;
   }
   .mode-nav-btn, a.mode-nav-btn {
-    padding: 5px 10px;
-    font-size: 12px;
+    padding: 5px 8px;
+    font-size: 11px;
     gap: 4px;
+    flex-shrink: 0;
   }
 }
 
