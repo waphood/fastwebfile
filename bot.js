@@ -11,7 +11,7 @@ const CONFIG_PATH = path.join(__dirname, 'bot_config.json');
 
 function loadConfig() {
   let cfg = {
-    botToken: process.env.BOT_TOKEN || '8921742373:AAEGsuPulshO3WN_fTpRI-1zGvyfZzojY4s',
+    botToken: process.env.BOT_TOKEN || '8921742373:AAHiTaQiL9ST2BJjRbKOyij1UCa7s8z7QIM',
     adminId: Number(process.env.ADMIN_ID) || 7936378054,
     appUrl: process.env.RENDER_EXTERNAL_URL || (process.env.RENDER_EXTERNAL_HOSTNAME ? `https://${process.env.RENDER_EXTERNAL_HOSTNAME}` : (process.env.APP_URL || '')),
     disableLocalPolling: true
